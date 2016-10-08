@@ -1,0 +1,30 @@
+{
+  "name": "feather-test",
+  "version": "0.5.0",
+  "description": "Extremely lightweight test coverage",
+  "keywords": [
+    "feather",
+    "testing",
+    "unit",
+    "lightweight",
+    "simple",
+    "easy",
+    "quick",
+    "jasmine",
+    "karma",
+    "alternative"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./test/automated"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seebigs/feather-test.git"
+  },
+  "author": "Chris Bigelow <seebigswork@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seebigs/feather-test/issues"
+  }
+}
