@@ -43,7 +43,7 @@ describe('mogwai', function () {
         describe('he becomes a gremlin', function () {
             expect(skin).not.toBe('furry');
             expect(temperament).toContain('angry');
-            expect(explosions).toBe(7, 'explosions caused by gremlins');
+            expect(explosions).toBeGreaterThan(99, 'explosions caused by gremlins');
         });
 
     });
@@ -83,6 +83,7 @@ $ npm run test
 *any of the below can be negated using not.matcher*
 
 - toBe
+- toBeGreaterThan
+- toBeLessThan
 - toContain
-
-more coming soon...
+- toEqual

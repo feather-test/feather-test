@@ -1,5 +1,6 @@
 
 var path = require('path');
+var matchers = require('./matchers.js');
 var utils = require('./utils.js');
 
 var tab = '   ';
@@ -42,24 +43,10 @@ function describe (label, assertions) {
     }
 }
 
-function getMatchers (expected, negated) {
-    var neg = negated ? ' not' : '';
-    return {
-        toBe: function (actual, msg) {
-            var result = 'Expected "' + expected + '"' + neg + ' to be "' + actual + '" ' + (msg || '');
-            recordResult(actual === expected, negated, result);
-        },
-        toContain: function (actual, msg) {
-            var result = 'Expected "' + expected + '"' + neg + ' to contain "' + actual + '" ' + (msg || '');
-            recordResult(expected.indexOf(actual) !== -1, negated, result);
-        }
-    }
-}
-
-function expect (expected) {
-    var matchers = getMatchers(expected);
-    matchers.not = getMatchers(expected, true);
-    return matchers;
+function expect (actual) {
+    var finalMatchers = matchers.get(actual, recordResult);
+    finalMatchers.not = matchers.get(actual, recordResult, true);
+    return finalMatchers;
 }
 
 function recordResult (passed, negated, result) {

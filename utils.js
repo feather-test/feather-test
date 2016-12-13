@@ -1,6 +1,8 @@
 
 var fs = require('fs');
 
+var hasProp = Object.prototype.hasOwnProperty;
+
 function each (collection, iteratee, thisArg) {
     if (collection) {
         if (typeof collection.length !== 'undefined') {
@@ -52,5 +54,6 @@ function listFiles (dir, ext, _list) {
 }
 
 module.exports = {
+    each: each,
     listFiles: listFiles
 };

@@ -3,6 +3,7 @@
  */
 
 var featherTest = require('../index.js');
+var utils = require('../utils.js');
 
 // override console.log so we can validate output
 var logs = [];
@@ -11,12 +12,13 @@ console.log = function (msg) {
     logs.push(msg);
 };
 
-function validateOutput (expected, actual) {
+function validateOutput (actual, expected) {
     var unexpectedResults = false;
-    actual.forEach(function (entry, i) {
+    utils.each(actual, function (entry, i) {
         if (entry !== expected[i]) {
             oldLog('   ✘ Expected "' + entry + '" to read "' + expected[i] + '"');
             unexpectedResults = true;
+            return false;
         }
     });
     if (!unexpectedResults) {
@@ -51,6 +53,10 @@ validateOutput(logs, [
   '',
   'matchers',
   '   Expected "true" to be "666" ',
+  '   Expected "{"a":1,"b":{"c":2}}" to be "666" ',
+  '   Expected "[123,{"a":1}]" to equal "666" ',
+  '   Expected "99" to be greater than "666" ',
+  '   Expected "999" to be less than "666" ',
   '   Expected "abc123def" to contain "666" ',
   '',
   'negated',
