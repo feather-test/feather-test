@@ -4,21 +4,39 @@
 
 var utils = require('./utils.js');
 
+var toString = Object.prototype.toString;
+
 function toStr (thing) {
     if (typeof thing === 'object') {
         return JSON.stringify(thing);
     }
-    return thing.toString();
+    return thing;
 }
 
 function deepMatch (expected, actual) {
-    if (typeof expected === 'object') {
+    if (typeof expected === 'object' && typeof actual === 'object') {
         var match = true;
+        var actualIsEmpty = true;
+        var expectedIsEmpty = true;
+
         utils.each(expected, function (val, prop) {
+            expectedIsEmpty = false;
             if (!deepMatch(val, actual[prop])) {
                 return match = false;
             }
         });
+
+        utils.each(actual, function (val, prop) {
+            actualIsEmpty = false;
+            if (!deepMatch(val, expected[prop])) {
+                return match = false;
+            }
+        });
+
+        if (actualIsEmpty && expectedIsEmpty) {
+            return toString.call(actual) === toString.call(expected);
+        }
+
         return match;
 
     } else {
