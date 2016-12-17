@@ -44,28 +44,28 @@ function deepMatch (expected, actual) {
     }
 }
 
-function get (actual, recordResult, negated) {
+function get (currentTest, actual, recordResult, negated) {
     var neg = negated ? ' not' : '';
     return {
         toBe: function (expected, msg) {
             var result = 'Expected "' + toStr(actual) + '"' + neg + ' to be "' + toStr(expected) + '" ' + (msg || '');
-            recordResult(deepMatch(expected, actual), negated, result);
+            recordResult(currentTest, deepMatch(expected, actual), negated, result);
         },
         toBeGreaterThan: function (expected, msg) {
             var result = 'Expected "' + toStr(actual) + '"' + neg + ' to be greater than "' + toStr(expected) + '" ' + (msg || '');
-            recordResult(actual > expected, negated, result);
+            recordResult(currentTest, actual > expected, negated, result);
         },
         toBeLessThan: function (expected, msg) {
             var result = 'Expected "' + toStr(actual) + '"' + neg + ' to be less than "' + toStr(expected) + '" ' + (msg || '');
-            recordResult(actual < expected, negated, result);
+            recordResult(currentTest, actual < expected, negated, result);
         },
         toContain: function (expected, msg) {
             var result = 'Expected "' + toStr(actual) + '"' + neg + ' to contain "' + toStr(expected) + '" ' + (msg || '');
-            recordResult(actual.indexOf(expected) !== -1, negated, result);
+            recordResult(currentTest, actual.indexOf(expected) !== -1, negated, result);
         },
         toEqual: function (expected, msg) {
             var result = 'Expected "' + toStr(actual) + '"' + neg + ' to equal "' + toStr(expected) + '" ' + (msg || '');
-            recordResult(deepMatch(expected, actual), negated, result);
+            recordResult(currentTest, deepMatch(expected, actual), negated, result);
         }
     }
 }

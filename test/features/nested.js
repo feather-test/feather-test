@@ -11,6 +11,8 @@ describe('two stuff', function () {
             expect(2).toBe(global.wrongValue || 2);
         });
 
+        expect('unnested').toBe(global.wrongValue || 'unnested');
+
     });
 
     describe('when it dries out', function () {

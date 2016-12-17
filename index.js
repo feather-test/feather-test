@@ -4,21 +4,22 @@ var matchers = require('./matchers.js');
 var utils = require('./utils.js');
 
 var tab = '   ';
-var currentTest;
+var withinTest;
 var lastDescribeHadExpectations;
 var testQueue;
 var passedTests;
 var failedTests;
 
 function reset () {
-    currentTest = void 0;
+    withinTest = void 0;
     lastDescribeHadExpectations = false;
     passedTests = [];
     failedTests = [];
 }
 
 function describe (label, assertions) {
-    if (currentTest) {
+    if (withinTest) {
+        var currentTest = arguments.callee.caller.arguments[0];
         var parentsArray = currentTest.parents;
         if (!currentTest.failedExpectations.length && !currentTest.passedExpectations.length) {
             if (lastDescribeHadExpectations) {
@@ -44,12 +45,13 @@ function describe (label, assertions) {
 }
 
 function expect (actual) {
-    var finalMatchers = matchers.get(actual, recordResult);
-    finalMatchers.not = matchers.get(actual, recordResult, true);
+    var currentTest = arguments.callee.caller.arguments[0];
+    var finalMatchers = matchers.get(currentTest, actual, recordResult);
+    finalMatchers.not = matchers.get(currentTest, actual, recordResult, true);
     return finalMatchers;
 }
 
-function recordResult (passed, negated, result) {
+function recordResult (currentTest, passed, negated, result) {
     if ((passed && !negated) || (!passed && negated)) {
         currentTest.passedExpectations.push(result);
     } else {
@@ -59,7 +61,9 @@ function recordResult (passed, negated, result) {
 }
 
 function runOne (test) {
-    currentTest = {
+    withinTest = true;
+
+    var currentTest = {
         label: test.label,
         passedExpectations: [],
         failedExpectations: [],
@@ -71,7 +75,7 @@ function runOne (test) {
         currentTest.parents = currentTest.parents.concat(test.parents);
     }
 
-    test.assertions();
+    test.assertions(currentTest);
 
     if (currentTest.containsExpectations) {
         if (currentTest.failedExpectations.length) {

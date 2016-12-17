@@ -32,7 +32,7 @@ featherTest.run();
 oldLog('\nWhen Feather is Passing\n');
 logs.shift();
 validateOutput(logs, [
-    'passed: 7',
+    'passed: 8',
     'failed: 0',
     '\nAll tests passed!'
 ]);
@@ -48,7 +48,7 @@ oldLog('\nWhen Feather is Failing\n');
 logs.shift();
 validateOutput(logs, [
   'passed: 0',
-  'failed: 7',
+  'failed: 8',
   '\nFailed tests:',
   '',
   'matchers',
@@ -75,6 +75,10 @@ validateOutput(logs, [
   '   when it gets wet',
   '      does not grow',
   '         Expected "2" to be "666" ',
+  '',
+  'two stuff',
+  '   when it gets wet',
+  '      Expected "unnested" to be "666" ',
   '',
   'two stuff',
   '   when it dries out',
