@@ -21,6 +21,10 @@ describe('two stuff', function () {
             expect(3).toBe(global.wrongValue || 3);
         });
 
+        xdescribe('can be ignored', function () {
+            expect('this test').toBe('unasserted');
+        });
+
         describe('does not shrink', function () {
             expect(4).toBe(global.wrongValue || 4);
         });

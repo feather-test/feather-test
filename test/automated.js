@@ -34,6 +34,7 @@ logs.shift();
 validateOutput(logs, [
     'passed: 8',
     'failed: 0',
+    'skipped: 1',
     '\nAll tests passed!'
 ]);
 
@@ -49,6 +50,7 @@ logs.shift();
 validateOutput(logs, [
   'passed: 0',
   'failed: 8',
+  'skipped: 1',
   '\nFailed tests:',
   '',
   'matchers',

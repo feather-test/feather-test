@@ -9,12 +9,14 @@ var lastDescribeHadExpectations;
 var testQueue;
 var passedTests;
 var failedTests;
+var skippedTests;
 
 function reset () {
     withinTest = void 0;
     lastDescribeHadExpectations = false;
     passedTests = [];
     failedTests = [];
+    skippedTests = [];
 }
 
 function describe (label, assertions) {
@@ -42,6 +44,10 @@ function describe (label, assertions) {
             assertions: assertions
         });
     }
+}
+
+function xdescribe (label) {
+    skippedTests.push(label);
 }
 
 function expect (actual) {
@@ -98,6 +104,10 @@ function run () {
     console.log('passed: ' +  passedTests.length);
     console.log('failed: ' + failedTests.length);
 
+    if (skippedTests.length) {
+        console.log('skipped: ' + skippedTests.length);
+    }
+
     if (failedTests.length) {
         console.log('\nFailed tests:');
         failedTests.forEach(function (failure) {
@@ -134,6 +144,7 @@ function specs (dir) {
 }
 
 global.describe = describe;
+global.xdescribe = xdescribe;
 global.expect = expect;
 
 module.exports = {
