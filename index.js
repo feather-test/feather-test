@@ -1,4 +1,5 @@
 
+var fs = require('fs');
 var path = require('path');
 var matchers = require('./matchers.js');
 var utils = require('./utils.js');
@@ -136,11 +137,17 @@ function run () {
 function specs (dir) {
     testQueue = [];
     var pathToSpecs = path.resolve(path.dirname(module.parent.filename), dir);
-    var files = utils.listFiles(pathToSpecs);
-    files.forEach(function (file) {
-        delete require.cache[file];
-        require(file);
-    });
+    var stats = fs.statSync(pathToSpecs);
+    if (stats.isFile()) {
+        require(pathToSpecs);
+
+    } else {
+        var files = utils.listFiles(pathToSpecs);
+        files.forEach(function (file) {
+            delete require.cache[file];
+            require(file);
+        });
+    }
 }
 
 global.describe = describe;
