@@ -28,24 +28,41 @@ var featherTest = require('feather-test');
 
 // point to the directory that contains your spec files
 // queues tests that are defined within
-featherTest.specs('./specs');
+featherTest.queue('./specs');
 
-// run queued tests when this script is invoked
-featherTest.run();
+// run all queued tests by calling `run`
+// (can pass an optional callback to be executed after tests finish)
+featherTest.run(callback);
 ```
 
 *myProject/test/specs/one.spec.js*
 ```js
-describe('mogwai', function () {
+describe('gizmo is a mogwai', function () {
 
-    describe('when he gets wet', function () {
+    describe('when you feed him after midnight', function () {
 
-        describe('he becomes a gremlin', function () {
+        describe('he becomes a gremlin', function (expect) {
             expect(skin).not.toBe('furry');
             expect(temperament).toContain('angry');
             expect(explosions).toBeGreaterThan(99, 'explosions caused by gremlins');
         });
 
+    });
+
+});
+```
+
+*myProject/test/specs/two.spec.js*
+```js
+describe('teddy ruxpin is the creepiest bear ever', function () {
+
+    // example of an asynchronous test
+    describe('he blinks twice every 3 seconds', function (expect, done) {
+        activateTeddy();
+        setTimeout(function () {
+            expect(timesBlinked).toBe(4);
+            done();
+        }, 6000);
     });
 
 });
@@ -60,7 +77,7 @@ describe('mogwai', function () {
 }
 ```
 
-## Run
+## Run Your Tests
 ```
 $ cd myProject
 $ npm run test
@@ -77,10 +94,10 @@ $ npm run test
 *globally available within spec files*
 
 - describe (can be nested)
-- expect
+- xdescribe (skips this block and all assertions contained within)
 
 ## Available Matchers
-*any of the below can be negated using not.matcher*
+*any of the below can also be negated using not.matcher*
 
 - toBe
 - toBeGreaterThan
