@@ -5,13 +5,22 @@
 var featherTest = require('../index.js');
 
 console.log('\n\n########## Should Pass ##########');
+global.wrongValue = null;
+featherTest.unqueue();
+featherTest.queue('./features');
 
-featherTest.specs('./features');
-featherTest.run();
+featherTest.run(function () {
+    console.log('\n\n########## Should Fail ##########');
+    global.wrongValue = 666;
+    featherTest.unqueue();
+    featherTest.queue('./features');
 
-console.log('\n\n########## Should Fail ##########');
+    featherTest.run(function () {
+        console.log('\n\n########## Should Time Out ##########');
+        featherTest.options.timeout = 500;
+        featherTest.unqueue();
+        featherTest.queue('./timeout');
 
-global.wrongValue = 666;
-featherTest.reset();
-featherTest.specs('./features');
-featherTest.run();
+        featherTest.run();
+    });
+});

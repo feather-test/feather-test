@@ -1,38 +1,36 @@
 
-describe('two stuff', function () {
+describe('sponge', function () {
 
-    describe('when it gets wet', function () {
+    describe('when it gets wet', function (expect) {
 
-        describe('shrinks', function () {
-            expect(1).toBe(global.wrongValue || 1);
+        describe('grows', function (expect) {
+            expect('larger').toBe(global.wrongValue || 'larger');
         });
 
-        describe('does not grow', function () {
-            expect(2).toBe(global.wrongValue || 2);
+        describe('does not shrink', function (expect) {
+            expect('same').toBe(global.wrongValue || 'same');
         });
 
         expect('unnested').toBe(global.wrongValue || 'unnested');
 
     });
 
-    describe('when it dries out', function () {
+    describe('when it dries out', function (expect) {
 
-        describe('grows', function () {
-            expect(3).toBe(global.wrongValue || 3);
-        });
+        expect('unnested').toBe(global.wrongValue || 'unnested');
 
-        xdescribe('can be ignored', function () {
+        xdescribe('can be ignored', function (expect) {
             expect('this test').toBe('unasserted');
         });
 
-        describe('does not shrink', function () {
-            expect(4).toBe(global.wrongValue || 4);
+        describe('shrinks', function (expect) {
+            expect('smaller').toBe(global.wrongValue || 'smaller');
         });
 
     });
 
 });
 
-describe('three stuff', function () {
-    expect(5).toBe(global.wrongValue || 5, 'extra messages too!');
+describe('additional outer blocks', function (expect) {
+    expect('extra').toBe(global.wrongValue || 'extra', 'extra messages too!');
 });

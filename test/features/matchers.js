@@ -1,5 +1,5 @@
 
-describe('matchers', function () {
+describe('matchers', function (expect) {
     expect(true).toBe(global.wrongValue || true);
     expect({ a:1, b:{ c:2 } }).toBe(global.wrongValue || { a:1, b:{ c:2 } });
     expect([123, {a:1}]).toEqual(global.wrongValue || [123, {a:1}]);

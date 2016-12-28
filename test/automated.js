@@ -26,72 +26,91 @@ function validateOutput (actual, expected) {
     }
 }
 
-featherTest.specs('./features');
-featherTest.run();
+featherTest.queue('./features');
+featherTest.run(function () {
+    oldLog('\nWhen Feather is Passing\n');
+    logs.shift();
+    validateOutput(logs, [
+        'passed: 9',
+        'failed: 0',
+        'skipped: 1',
+        '\nAll tests passed!'
+    ]);
 
-oldLog('\nWhen Feather is Passing\n');
-logs.shift();
-validateOutput(logs, [
-    'passed: 8',
-    'failed: 0',
-    'skipped: 1',
-    '\nAll tests passed!'
-]);
 
-global.wrongValue = 666;
+    global.wrongValue = 666;
 
-logs = [];
-featherTest.reset();
-featherTest.specs('./features');
-featherTest.run();
+    logs = [];
+    featherTest.unqueue();
+    featherTest.queue('./features');
+    featherTest.run(function () {
+        oldLog('\nWhen Feather is Failing\n');
+        logs.shift();
+        validateOutput(logs, [
+            'passed: 0',
+            'failed: 9',
+            'skipped: 1',
+            '\nFailed tests:',
+            '',
+            'matchers',
+            '   Expected "true" to be "666" ',
+            '   Expected "{"a":1,"b":{"c":2}}" to be "666" ',
+            '   Expected "[123,{"a":1}]" to equal "666" ',
+            '   Expected "{}" to equal "666" ',
+            '   Expected "99" to be greater than "666" ',
+            '   Expected "999" to be less than "666" ',
+            '   Expected "abc123def" to contain "666" ',
+            '',
+            'negated',
+            '   when mogwai gets wet',
+            '      he becomes a gremlin',
+            '         Expected "smooth" not to be "smooth" ',
+            '         Expected "angry" to be "666" ',
+            '',
+            'sponge',
+            '   when it gets wet',
+            '      grows',
+            '         Expected "larger" to be "666" ',
+            '',
+            'sponge',
+            '   when it gets wet',
+            '      does not shrink',
+            '         Expected "same" to be "666" ',
+            '',
+            'sponge',
+            '   when it gets wet',
+            '      Expected "unnested" to be "666" ',
+            '',
+            'sponge',
+            '   when it dries out',
+            '      shrinks',
+            '         Expected "smaller" to be "666" ',
+            '',
+            'sponge',
+            '   when it dries out',
+            '      Expected "unnested" to be "666" ',
+            '',
+            'additional outer blocks',
+            '   Expected "extra" to be "666" extra messages too!',
+            '',
+            'async',
+            '   asserts expectations eventually',
+            '      Expected "666" to be "3" '
+        ]);
 
-oldLog('\nWhen Feather is Failing\n');
-logs.shift();
-validateOutput(logs, [
-  'passed: 0',
-  'failed: 8',
-  'skipped: 1',
-  '\nFailed tests:',
-  '',
-  'matchers',
-  '   Expected "true" to be "666" ',
-  '   Expected "{"a":1,"b":{"c":2}}" to be "666" ',
-  '   Expected "[123,{"a":1}]" to equal "666" ',
-  '   Expected "{}" to equal "666" ',
-  '   Expected "99" to be greater than "666" ',
-  '   Expected "999" to be less than "666" ',
-  '   Expected "abc123def" to contain "666" ',
-  '',
-  'negated',
-  '   when mogwai gets wet',
-  '      he becomes a gremlin',
-  '         Expected "smooth" not to be "smooth" ',
-  '         Expected "angry" to be "666" ',
-  '',
-  'two stuff',
-  '   when it gets wet',
-  '      shrinks',
-  '         Expected "1" to be "666" ',
-  '',
-  'two stuff',
-  '   when it gets wet',
-  '      does not grow',
-  '         Expected "2" to be "666" ',
-  '',
-  'two stuff',
-  '   when it gets wet',
-  '      Expected "unnested" to be "666" ',
-  '',
-  'two stuff',
-  '   when it dries out',
-  '      grows',
-  '         Expected "3" to be "666" ',
-  '',
-  'two stuff',
-  '   when it dries out',
-  '      does not shrink',
-  '         Expected "4" to be "666" ',
-  '',
-  'three stuff',
-  '   Expected "5" to be "666" extra messages too!'
-]);
+
+
+        logs = [];
+        featherTest.options.timeout = 100;
+        featherTest.unqueue();
+        featherTest.queue('./timeout');
+        featherTest.run(function () {
+            oldLog('\nWhen Feather Times Out\n');
+            logs.shift();
+            validateOutput(logs, [
+                'timeout',
+                '   is handled properly'
+            ]);
+        });
+    });
+});

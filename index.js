@@ -5,57 +5,92 @@ var matchers = require('./matchers.js');
 var utils = require('./utils.js');
 
 var tab = '   ';
-var withinTest;
-var lastDescribeHadExpectations;
-var testQueue;
+var testQueue = [];
+var pendingDescribes;
 var passedTests;
 var failedTests;
 var skippedTests;
+var afterRun;
+
+var options = {
+    timeout: 2000
+};
+
+var expectContext = {
+    labels: []
+};
 
 function reset () {
-    withinTest = void 0;
-    lastDescribeHadExpectations = false;
+    pendingDescribes = 0;
     passedTests = [];
     failedTests = [];
     skippedTests = [];
 }
 
 function describe (label, assertions) {
-    if (withinTest) {
-        var currentTest = arguments.callee.caller.arguments[0];
-        var parentsArray = currentTest.parents;
-        if (!currentTest.failedExpectations.length && !currentTest.passedExpectations.length) {
-            if (lastDescribeHadExpectations) {
-                parentsArray.pop();
-            }
-            parentsArray = parentsArray.concat(currentTest.label);
-            lastDescribeHadExpectations = false;
-        } else {
-            lastDescribeHadExpectations = true;
-        }
-        runOne({
-            label: label,
-            assertions: assertions,
-            parents: parentsArray
-        });
+    pendingDescribes++;
+    var async = assertions.length > 1;
 
-    } else {
-        testQueue.push({
-            label: label,
-            assertions: assertions
-        });
+    // preserve labels from parent describes
+    expectContext.labels.push(label);
+
+    // reset expectations
+    expectContext.passedExpectations = [];
+    expectContext.failedExpectations = [];
+    expectContext.containsExpectations = false;
+
+
+    var expect = function (actual) {
+        var finalMatchers = matchers.get(this, actual, recordResult);
+        finalMatchers.not = matchers.get(this, actual, recordResult, true);
+        return finalMatchers;
+    }
+
+    var clonedExpectContext = utils.clone(expectContext);
+    var assertionArgs = [ expect.bind(clonedExpectContext) ];
+    if (async) {
+        clonedExpectContext.async = true;
+        assertionArgs.push(describeDone.bind(clonedExpectContext));
+        clonedExpectContext.timeout = setTimeout(function () {
+            output('\nSpec timed out!\n');
+            var indent = '';
+            clonedExpectContext.labels.forEach(function (label) {
+                output(indent + label);
+                indent += tab;
+            });
+            if (typeof afterRun === 'function') {
+                afterRun();
+            }
+        }, options.timeout);
+    }
+    assertions.apply(clonedExpectContext, assertionArgs);
+
+    expectContext.labels.pop();
+    if (!async) {
+        describeDone.apply(clonedExpectContext);
+    }
+}
+
+function describeDone () {
+    clearTimeout(this.timeout);
+    pendingDescribes--;
+
+    if (this.containsExpectations) {
+        if (this.failedExpectations.length) {
+            failedTests.push(this);
+        } else if (this.passedExpectations.length) {
+            passedTests.push(this);
+        }
+        this.containsExpectations = false;
+    }
+
+    if (this.async && pendingDescribes <= 0) {
+        reportResults();
     }
 }
 
 function xdescribe (label) {
     skippedTests.push(label);
-}
-
-function expect (actual) {
-    var currentTest = arguments.callee.caller.arguments[0];
-    var finalMatchers = matchers.get(currentTest, actual, recordResult);
-    finalMatchers.not = matchers.get(currentTest, actual, recordResult, true);
-    return finalMatchers;
 }
 
 function recordResult (currentTest, passed, negated, result) {
@@ -67,95 +102,96 @@ function recordResult (currentTest, passed, negated, result) {
     currentTest.containsExpectations = true;
 }
 
-function runOne (test) {
-    withinTest = true;
-
-    var currentTest = {
-        label: test.label,
-        passedExpectations: [],
-        failedExpectations: [],
-        containsExpectations: false,
-        parents: []
-    };
-
-    if (test.parents) {
-        currentTest.parents = currentTest.parents.concat(test.parents);
-    }
-
-    test.assertions(currentTest);
-
-    if (currentTest.containsExpectations) {
-        if (currentTest.failedExpectations.length) {
-            failedTests.push(currentTest);
-        } else if (currentTest.passedExpectations.length) {
-            passedTests.push(currentTest);
-        }
-        currentTest.containsExpectations = false;
-    }
-}
-
-function run () {
-    reset();
-
-    testQueue.forEach(function (test) {
-        runOne(test);
-    });
-
-    console.log('\nResults\n------');
-    console.log('passed: ' +  passedTests.length);
-    console.log('failed: ' + failedTests.length);
+function reportResults () {
+    output('\nResults\n------');
+    output('passed: ' +  passedTests.length);
+    output('failed: ' + failedTests.length);
 
     if (skippedTests.length) {
-        console.log('skipped: ' + skippedTests.length);
+        output('skipped: ' + skippedTests.length);
     }
 
     if (failedTests.length) {
-        console.log('\nFailed tests:');
+        output('\nFailed tests:');
         failedTests.forEach(function (failure) {
             var indent = '';
-
-            console.log(''); // adds line break
-            failure.parents.forEach(function (p) {
-                console.log(indent + p);
+            output(''); // adds line break
+            failure.labels.forEach(function (label) {
+                output(indent + label);
                 indent += tab;
             });
-
-            console.log(indent + failure.label);
             failure.failedExpectations.forEach(function (reason) {
-                console.log(indent + tab + reason);
+                output(indent + reason);
             });
         });
 
     } else if (passedTests.length) {
-        console.log('\nAll tests passed!');
+        output('\nAll tests passed!');
 
     } else {
-        console.log('\nNo tests ran.');
+        output('\nNo tests ran.');
+    }
+
+    if (typeof afterRun === 'function') {
+        afterRun();
     }
 }
 
-function specs (dir) {
-    testQueue = [];
-    var pathToSpecs = path.resolve(path.dirname(module.parent.filename), dir);
-    var stats = fs.statSync(pathToSpecs);
-    if (stats.isFile()) {
-        require(pathToSpecs);
+function output (msg) {
+    console.log(msg);
+}
 
+function run (callback) {
+    afterRun = callback;
+
+    if (pendingDescribes) {
+        output('Please wait. ' + pendingDescribes + ' tests are still running.');
     } else {
-        var files = utils.listFiles(pathToSpecs);
-        files.forEach(function (file) {
-            delete require.cache[file];
-            require(file);
+        reset();
+        testQueue.forEach(function (tq) {
+            var pathToSpecs = path.resolve(path.dirname(module.parent.filename), tq);
+            var stats = fs.statSync(pathToSpecs);
+            if (stats.isFile()) {
+                delete require.cache[require.resolve(pathToSpecs)];
+                require(pathToSpecs);
+
+            } else {
+                var files = utils.listFiles(pathToSpecs);
+                files.forEach(function (file) {
+                    delete require.cache[file];
+                    require(file);
+                });
+            }
         });
+
+        if (pendingDescribes <= 0) {
+            reportResults();
+        }
     }
 }
+
+function queue (dir) {
+    testQueue.push(dir);
+}
+
+function unqueue (dir) {
+    if (dir) {
+        var dirAt = testQueue.indexOf(dir);
+        if (dirAt !== -1) {
+            testQueue.splice(dirAt, 1);
+        }
+    } else {
+        testQueue = [];
+    }
+}
+
 
 global.describe = describe;
 global.xdescribe = xdescribe;
-global.expect = expect;
 
 module.exports = {
-    reset: reset,
+    options: options,
     run: run,
-    specs: specs
+    queue: queue,
+    unqueue: unqueue
 };
