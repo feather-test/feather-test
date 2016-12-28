@@ -13,7 +13,7 @@ var skippedTests;
 var afterRun;
 
 var options = {
-    timeout: 2000
+    timeout: 5000
 };
 
 var expectContext = {
@@ -58,6 +58,7 @@ function describe (label, assertions) {
                 output(indent + label);
                 indent += tab;
             });
+            output(indent + 'should call done() within ' + options.timeout + 'ms');
             if (typeof afterRun === 'function') {
                 afterRun();
             }

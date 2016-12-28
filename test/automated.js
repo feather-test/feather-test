@@ -110,7 +110,8 @@ featherTest.run(function () {
             logs.shift();
             validateOutput(logs, [
                 'timeout',
-                '   is handled properly'
+                '   is handled properly',
+                '      should call done() within 100ms'
             ]);
         });
     });
