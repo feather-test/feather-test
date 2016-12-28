@@ -94,7 +94,8 @@ featherTest.run(function () {
             '   Expected "extra" to be "666" extra messages too!',
             '',
             'async',
-            '   asserts expectations eventually',
+            '   asserts expectations now and later',
+            '      Expected "666" to be "outer" ',
             '      Expected "666" to be "3" '
         ]);
 
