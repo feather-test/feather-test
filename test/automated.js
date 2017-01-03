@@ -55,6 +55,7 @@ featherTest.run(function () {
             'matchers',
             '   Expected "true" to be "666" ',
             '   Expected "{"a":1,"b":{"c":2}}" to be "666" ',
+            '   Expected "{"fn":"[Function]"}" to be "666" ',
             '   Expected "[123,{"a":1}]" to equal "666" ',
             '   Expected "{}" to equal "666" ',
             '   Expected "99" to be greater than "666" ',

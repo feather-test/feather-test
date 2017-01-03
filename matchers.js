@@ -6,9 +6,13 @@ var utils = require('./utils.js');
 
 var toString = Object.prototype.toString;
 
+function fnReplacer (key, val) {
+    return (typeof val === 'function') ? '[Function]' : val;
+}
+
 function toStr (thing) {
     if (typeof thing === 'object') {
-        return JSON.stringify(thing);
+        return JSON.stringify(thing, fnReplacer);
     }
     return thing;
 }
