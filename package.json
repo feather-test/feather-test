@@ -26,5 +26,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/seebigs/feather-test/issues"
+  },
+  "devDependencies": {
+    "chalk": "^1.1.3"
   }
 }

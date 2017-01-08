@@ -16,11 +16,17 @@ featherTest.run(function () {
     featherTest.queue('./features');
 
     featherTest.run(function () {
-        console.log('\n\n########## Should Time Out ##########');
-        featherTest.options.timeout = 500;
+        console.log('\n\n########## Should Error ##########');
         featherTest.unqueue();
-        featherTest.queue('./timeout');
+        featherTest.queue('./errors');
 
-        featherTest.run();
+        featherTest.run(function () {
+            console.log('\n\n########## Should Time Out ##########');
+            featherTest.options.timeout = 500;
+            featherTest.unqueue();
+            featherTest.queue('./timeout');
+
+            featherTest.run();
+        });
     });
 });

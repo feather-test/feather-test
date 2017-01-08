@@ -2,6 +2,7 @@
  * Run automated validations
  */
 
+var chalk = require('chalk');
 var featherTest = require('../index.js');
 var utils = require('../utils.js');
 
@@ -16,13 +17,19 @@ function validateOutput (actual, expected) {
     var unexpectedResults = false;
     utils.each(actual, function (entry, i) {
         if (entry !== expected[i]) {
-            oldLog('   ✘ Expected "' + entry + '" to read "' + expected[i] + '"');
+            oldLog(chalk.red('   ✘ Expected "' + entry + '" to read "' + expected[i] + '"'));
             unexpectedResults = true;
             return false;
         }
     });
     if (!unexpectedResults) {
-        oldLog('   ✔ output is good');
+        oldLog(chalk.green('   ✔ output is good'));
+    }
+}
+
+function validateOne (issues, actual, expected) {
+    if (actual !== expected) {
+        issues.push(chalk.red('   ✘ Expected "' + actual + '" to read "' + expected + '"'));
     }
 }
 
@@ -103,17 +110,36 @@ featherTest.run(function () {
 
 
         logs = [];
-        featherTest.options.timeout = 100;
         featherTest.unqueue();
-        featherTest.queue('./timeout');
+        featherTest.queue('./errors');
         featherTest.run(function () {
-            oldLog('\nWhen Feather Times Out\n');
+            oldLog('\nWhen Feather Catches Errors\n');
             logs.shift();
-            validateOutput(logs, [
-                'timeout',
-                '   is handled properly',
-                '      should call done() within 100ms'
-            ]);
+            var issues = [];
+            validateOne(issues, (logs[5] || '').split('\n')[0], '   ReferenceError: oops is not defined');
+            validateOne(issues, logs[0], 'passed: 0');
+            validateOne(issues, logs[1], 'failed: 1');
+            if (issues.length) {
+                oldLog(issues[0]);
+            } else {
+                oldLog(chalk.green('   ✔ output is good'));
+            }
+
+
+
+            logs = [];
+            featherTest.options.timeout = 100;
+            featherTest.unqueue();
+            featherTest.queue('./timeout');
+            featherTest.run(function () {
+                oldLog('\nWhen Feather Times Out\n');
+                logs.shift();
+                validateOutput(logs, [
+                    'timeout',
+                    '   is handled properly',
+                    '      should call done() within 100ms'
+                ]);
+            });
         });
     });
 });

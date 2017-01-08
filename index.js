@@ -64,7 +64,11 @@ function describe (label, assertions) {
             }
         }, options.timeout);
     }
-    assertions.apply(clonedExpectContext, assertionArgs);
+    try {
+        assertions.apply(clonedExpectContext, assertionArgs);
+    } catch (err) {
+        recordResult(clonedExpectContext, false, false, err.stack);
+    }
 
     expectContext.labels.pop();
     if (!async) {
