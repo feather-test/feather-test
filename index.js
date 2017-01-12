@@ -177,6 +177,9 @@ function run (callback) {
 
 function queue (dir) {
     testQueue.push(dir);
+    return {
+        run: run
+    };
 }
 
 function unqueue (dir) {
