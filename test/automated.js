@@ -134,11 +134,16 @@ featherTest.run(function () {
             featherTest.run(function () {
                 oldLog('\nWhen Feather Times Out\n');
                 logs.shift();
-                validateOutput(logs, [
-                    'timeout',
-                    '   is handled properly',
-                    '      should call done() within 100ms'
-                ]);
+                var issues = [];
+                validateOne(issues, (logs[3] || '').split('\n')[0], 'ReferenceError: oops is not defined');
+                validateOne(issues, logs[0], 'timeout');
+                validateOne(issues, logs[1], '   is handled properly');
+                validateOne(issues, logs[2], '      should call done() within 100ms');
+                if (issues.length) {
+                    oldLog(issues[0]);
+                } else {
+                    oldLog(chalk.green('   ✔ output is good'));
+                }
             });
         });
     });

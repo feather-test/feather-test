@@ -59,11 +59,15 @@ function describe (label, assertions) {
                 indent += tab;
             });
             output(indent + 'should call done() within ' + options.timeout + 'ms');
+            if (clonedExpectContext.failedExpectations.length) {
+                output(clonedExpectContext.failedExpectations[0]);
+            }
             if (typeof afterRun === 'function') {
                 afterRun();
             }
         }, options.timeout);
     }
+
     try {
         assertions.apply(clonedExpectContext, assertionArgs);
     } catch (err) {
