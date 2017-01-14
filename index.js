@@ -150,6 +150,12 @@ function output (msg) {
     console.log(msg);
 }
 
+function clearRequireCache () {
+    for (var x in require.cache) {
+        delete require.cache[x];
+    }
+}
+
 function run (callback) {
     afterRun = callback;
 
@@ -161,13 +167,13 @@ function run (callback) {
             var pathToSpecs = path.resolve(path.dirname(module.parent.filename), tq);
             var stats = fs.statSync(pathToSpecs);
             if (stats.isFile()) {
-                delete require.cache[require.resolve(pathToSpecs)];
+                clearRequireCache();
                 require(pathToSpecs);
 
             } else {
                 var files = utils.listFiles(pathToSpecs);
                 files.forEach(function (file) {
-                    delete require.cache[file];
+                    clearRequireCache();
                     require(file);
                 });
             }
@@ -182,7 +188,8 @@ function run (callback) {
 function queue (dir) {
     testQueue.push(dir);
     return {
-        run: run
+        run: run,
+        queued: testQueue
     };
 }
 

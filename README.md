@@ -2,7 +2,7 @@
 
 **Extremely lightweight test coverage**
 
-*For when you know you need validation, but you don't want to configure a full-featured test suite*
+*For when you know you need validation, but you don't want to configure a heavy test suite*
 
 ## Install
 ```
@@ -54,9 +54,9 @@ describe('gizmo is a mogwai', function () {
 
 *myProject/test/specs/two.spec.js*
 ```js
+// example of an asynchronous test
 describe('teddy ruxpin is the creepiest bear ever', function () {
 
-    // example of an asynchronous test
     describe('he blinks twice every 3 seconds', function (expect, done) {
         activateTeddy();
         setTimeout(function () {
@@ -80,7 +80,7 @@ describe('teddy ruxpin is the creepiest bear ever', function () {
 ## Run Your Tests
 ```
 $ cd myProject
-$ npm run test
+$ npm test
 
 // Results
 // ------
@@ -97,10 +97,13 @@ $ npm run test
 - xdescribe (skips this block and all assertions contained within)
 
 ## Available Matchers
-*any of the below can also be negated using not.matcher*
+*any of the below can also be negated using not.toBe, etc.*
 
 - toBe
 - toBeGreaterThan
 - toBeLessThan
 - toContain
 - toEqual
+
+## Mocks
+Any required module can be mocked. [Learn how to mock modules](https://github.com/seebigs/feather-test/wiki/How-to-mock-modules)
