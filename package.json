@@ -1,6 +1,6 @@
 {
   "name": "feather-test",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Extremely lightweight test coverage",
   "keywords": [
     "feather",
@@ -16,7 +16,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/automated"
+    "test": "node test/automated"
   },
   "repository": {
     "type": "git",
