@@ -1,9 +1,7 @@
 
-var mock = require('mock-require');
-
-mock('../fixture/sub/three.js', { name: 'mocked' });
+require.cache.mock('../fixture/sub/three.js', { name: 'mocked' });
 var one = require('../fixture/one.js');
-mock.stopAll();
+require.cache.mock.stopAll();
 
 describe('one.spec', function () {
 

@@ -2,7 +2,7 @@
 
 **Extremely lightweight test coverage**
 
-*For when you know you need validation, but you don't want to configure a heavy test suite*
+*Refactor safely -- without configuring a heavy test suite*
 
 ## Install
 ```
@@ -82,12 +82,7 @@ describe('teddy ruxpin is the creepiest bear ever', function () {
 $ cd myProject
 $ npm test
 
-// Results
-// ------
-// passed: 11
-// failed: 0
-//
-// All tests passed!
+// All 4 tests passed!
 ```
 
 ## Spec Methods

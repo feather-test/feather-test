@@ -1,4 +1,7 @@
 
+// add the ability to use mocks
+require('require-cache-mock');
+
 var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
@@ -7,13 +10,16 @@ var utils = require('./utils.js');
 
 var tab = '   ';
 var testQueue = [];
-var pendingDescribes;
+var pendingAsync;
+var pendingSync;
 var passedTests;
 var failedTests;
 var skippedTests;
 var afterRun;
+var shortCircuit;
 
 var options = {
+    stopAfterFistFailure: false,
     timeout: 5000
 };
 
@@ -22,15 +28,25 @@ var expectContext = {
 };
 
 function reset () {
-    pendingDescribes = 0;
+    pendingAsync = 0;
+    pendingSync = 0;
     passedTests = [];
     failedTests = [];
     skippedTests = [];
 }
 
+function hasPending () {
+    return pendingSync > 0 || pendingAsync > 0;
+}
+
 function describe (label, assertions) {
-    pendingDescribes++;
     var async = assertions.length > 1;
+
+    if (async) {
+        pendingAsync++;
+    } else {
+        pendingSync++;
+    }
 
     // preserve labels from parent describes
     expectContext.labels.push(label);
@@ -60,9 +76,7 @@ function describe (label, assertions) {
                 indent += tab;
             });
             output(indent + 'should call done() within ' + options.timeout + 'ms');
-            if (typeof afterRun === 'function') {
-                afterRun();
-            }
+            shortCircuit();
         }, options.timeout);
     }
 
@@ -84,20 +98,26 @@ function describe (label, assertions) {
 
 function describeDone () {
     clearTimeout(this.timeout);
-    pendingDescribes--;
+
+    if (this.async) {
+        pendingAsync--;
+    } else {
+        pendingSync--;
+    }
 
     if (this.containsExpectations) {
         if (this.failedExpectations.length) {
             failedTests.push(this);
+            if (options.stopAfterFistFailure) {
+                shortCircuit(true);
+            }
         } else if (this.passedExpectations.length) {
             passedTests.push(this);
         }
         this.containsExpectations = false;
     }
 
-    if (pendingDescribes <= 0) {
-        reportResults();
-    }
+    afterRun();
 }
 
 function xdescribe (label) {
@@ -139,10 +159,6 @@ function reportResults () {
     if (skippedTests.length) {
         output('\n(' + skippedTests.length + ' tests skipped)');
     }
-
-    if (typeof afterRun === 'function') {
-        afterRun();
-    }
 }
 
 function output (msg, indent) {
@@ -156,12 +172,33 @@ function clearRequireCache () {
 }
 
 function run (callback) {
-    afterRun = callback;
+    var allParsed = false;
 
-    if (pendingDescribes) {
-        output('Please wait. ' + pendingDescribes + ' tests are still running.');
+    shortCircuit = function (withReport) {
+        if (withReport) {
+            reportResults();
+        }
+        afterRun = function(){};
+        shortCircuit = function(){};
+        if (typeof callback === 'function') {
+            callback();
+        }
+    };
+
+    afterRun = function () {
+        if (allParsed && !hasPending()) {
+            reportResults();
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }
+    };
+
+    if (pendingSync) {
+        output('Please wait. ' + pendingSync + ' tests are still running.');
     } else {
         reset();
+
         testQueue.forEach(function (tq) {
             var pathToSpecs = path.resolve(path.dirname(module.parent.filename), tq);
             var stats = fs.statSync(pathToSpecs);
@@ -177,6 +214,9 @@ function run (callback) {
                 });
             }
         });
+
+        allParsed = true;
+        afterRun();
     }
 }
 
