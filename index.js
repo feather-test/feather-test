@@ -41,8 +41,8 @@ function describe (label, assertions) {
 
 
     var expect = function (actual) {
-        var finalMatchers = matchers.get(this, actual, recordResult);
-        finalMatchers.not = matchers.get(this, actual, recordResult, true);
+        var finalMatchers = matchers.get(this, tab, actual, recordResult);
+        finalMatchers.not = matchers.get(this, tab, actual, recordResult, true);
         return finalMatchers;
     }
 
@@ -59,9 +59,6 @@ function describe (label, assertions) {
                 indent += tab;
             });
             output(indent + 'should call done() within ' + options.timeout + 'ms');
-            if (clonedExpectContext.failedExpectations.length) {
-                output(clonedExpectContext.failedExpectations[0]);
-            }
             if (typeof afterRun === 'function') {
                 afterRun();
             }
@@ -71,7 +68,11 @@ function describe (label, assertions) {
     try {
         assertions.apply(clonedExpectContext, assertionArgs);
     } catch (err) {
-        recordResult(clonedExpectContext, false, false, err.stack);
+        clonedExpectContext.failedExpectations = []; // clear failed expectations to make room for the error
+        recordResult(clonedExpectContext, false, false, '\n' + (err.stack || err));
+        expectContext.labels.pop();
+        describeDone.apply(clonedExpectContext);
+        return;
     }
 
     expectContext.labels.pop();
@@ -93,7 +94,7 @@ function describeDone () {
         this.containsExpectations = false;
     }
 
-    if (this.async && pendingDescribes <= 0) {
+    if (pendingDescribes <= 0) {
         reportResults();
     }
 }
@@ -112,14 +113,6 @@ function recordResult (currentTest, passed, negated, result) {
 }
 
 function reportResults () {
-    output('\nResults\n------');
-    output('passed: ' +  passedTests.length);
-    output('failed: ' + failedTests.length);
-
-    if (skippedTests.length) {
-        output('skipped: ' + skippedTests.length);
-    }
-
     if (failedTests.length) {
         output('\nFailed tests:');
         failedTests.forEach(function (failure) {
@@ -130,15 +123,20 @@ function reportResults () {
                 indent += tab;
             });
             failure.failedExpectations.forEach(function (reason) {
-                output(indent + reason);
+                output(reason, indent);
             });
         });
+        output('\n' + failedTests.length + ' tests failed!');
 
     } else if (passedTests.length) {
-        output('\nAll tests passed!');
+        output('\nAll ' + passedTests.length + ' tests passed!');
 
     } else {
         output('\nNo tests ran.');
+    }
+
+    if (skippedTests.length) {
+        output('\n(' + skippedTests.length + ' tests skipped)');
     }
 
     if (typeof afterRun === 'function') {
@@ -146,8 +144,8 @@ function reportResults () {
     }
 }
 
-function output (msg) {
-    console.log(msg);
+function output (msg, indent) {
+    console.log(msg.replace(/\%\%/g, indent));
 }
 
 function clearRequireCache () {
@@ -178,10 +176,6 @@ function run (callback) {
                 });
             }
         });
-
-        if (pendingDescribes <= 0) {
-            reportResults();
-        }
     }
 }
 

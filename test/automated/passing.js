@@ -6,12 +6,9 @@ module.exports = function (LOG, validate, callback) {
     featherTest.queue('./features');
     featherTest.run(function () {
         LOG.out('\nWhen Feather is Passing\n');
-        LOG.history.shift();
         validate.all(LOG.history, [
-            'passed: 9',
-            'failed: 0',
-            'skipped: 1',
-            '\nAll tests passed!'
+            '\nAll 9 tests passed!',
+            '\n(1 tests skipped)'
         ]);
         callback();
     });
