@@ -1,4 +1,5 @@
 var featherTest = require('../../index.js');
+var chalk = require('chalk');
 
 module.exports = function (LOG, validate, callback) {
     LOG.history = [];
@@ -56,7 +57,7 @@ module.exports = function (LOG, validate, callback) {
             '   asserts expectations now and later',
             '      -----\n      expected\n         "666" {Number}\n      to be\n         "outer" {String}',
             '      -----\n      expected\n         "666" \n      to be\n         "3" ',
-            '\n9 tests failed!',
+            chalk.red('\n9 tests failed!'),
             '\n(1 tests skipped)'
         ]);
         callback();

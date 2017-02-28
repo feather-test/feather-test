@@ -1,4 +1,5 @@
 
+var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
 var matchers = require('./matchers.js');
@@ -52,7 +53,7 @@ function describe (label, assertions) {
         clonedExpectContext.async = true;
         assertionArgs.push(describeDone.bind(clonedExpectContext));
         clonedExpectContext.timeout = setTimeout(function () {
-            output('\nSpec timed out!\n');
+            output(chalk.yellow('\nSpec timed out!\n'));
             var indent = '';
             clonedExpectContext.labels.forEach(function (label) {
                 output(indent + label);
@@ -126,10 +127,10 @@ function reportResults () {
                 output(reason, indent);
             });
         });
-        output('\n' + failedTests.length + ' tests failed!');
+        output(chalk.red('\n' + failedTests.length + ' tests failed!'));
 
     } else if (passedTests.length) {
-        output('\nAll ' + passedTests.length + ' tests passed!');
+        output(chalk.green('\nAll ' + passedTests.length + ' tests passed!'));
 
     } else {
         output('\nNo tests ran.');

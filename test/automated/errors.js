@@ -8,7 +8,7 @@ module.exports = function (LOG, validate, callback) {
     featherTest.run(function () {
         LOG.out('\nWhen Feather Catches Errors\n');
         var issues = [];
-        validate.one(issues, LOG.history[5], '\n1 tests failed!');
+        validate.one(issues, LOG.history[5], chalk.red('\n1 tests failed!'));
         validate.one(issues, (LOG.history[4] || '').split('\n')[1], 'ReferenceError: oops is not defined');
         validate.one(issues, LOG.history[3], '   errors in assertions');
         if (issues.length) {
