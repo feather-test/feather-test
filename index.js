@@ -181,7 +181,7 @@ function run (callback) {
         afterRun = function(){};
         shortCircuit = function(){};
         if (typeof callback === 'function') {
-            callback();
+            callback(true, {});
         }
     };
 
@@ -189,7 +189,7 @@ function run (callback) {
         if (allParsed && !hasPending()) {
             reportResults();
             if (typeof callback === 'function') {
-                callback();
+                callback(!!failedTests.length, { passed: passedTests, failed: failedTests, skipped: skippedTests });
             }
         }
     };
