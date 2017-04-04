@@ -61,7 +61,7 @@ function resultMessage (matcher, actual, expected, tab, neg, msg, printType) {
     var _actual = _typeof(actual);
     var _expected = _typeof(expected);
     var ptype = printType && _actual !== _expected;
-    return '%%-----\n%%expected\n%%' + tab + toStr(actual, ptype) + '\n%%' + neg + matcher + '\n%%' + tab + toStr(expected, ptype) + (msg || '');
+    return '%%-----' + (msg ? '\n%%' + msg : '') + '\n%%expected\n%%' + tab + toStr(actual, ptype) + '\n%%' + neg + matcher + '\n%%' + tab + toStr(expected, ptype);
 }
 
 function get (currentTest, tab, actual, recordResult, negated) {

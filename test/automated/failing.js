@@ -51,7 +51,7 @@ module.exports = function (LOG, validate, callback) {
             '      -----\n      expected\n         "unnested" {String}\n      to be\n         "666" {Number}',
             '',
             'additional outer blocks',
-            '   -----\n   expected\n      "extra" {String}\n   to be\n      "666" {Number}extra messages too!',
+            '   -----\n   extra messages too!\n   expected\n      "extra" {String}\n   to be\n      "666" {Number}',
             '',
             'async',
             '   asserts expectations now and later',
