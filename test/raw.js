@@ -9,7 +9,15 @@ global.wrongValue = null;
 featherTest.unqueue();
 featherTest.queue('./features');
 
+global.featherHelpers = [];
+featherTest.helpers([
+    './helpers/helper1.js',
+    './helpers/helper2.js'
+]);
+featherTest.helpers('./helpers/globbed');
+
 featherTest.run(function () {
+    featherTest.helpers(null);
     console.log('\n\n########## Should Fail ##########');
     global.wrongValue = 666;
     featherTest.unqueue();

@@ -9,6 +9,7 @@ var matchers = require('./matchers.js');
 var utils = require('./utils.js');
 
 var tab = '   ';
+var helpersQueue = [];
 var testQueue = [];
 var pendingAsync;
 var pendingSync;
@@ -199,6 +200,20 @@ function run (callback) {
     } else {
         reset();
 
+        helpersQueue.forEach(function (hq) {
+            var pathToHelpers = path.resolve(path.dirname(module.parent.filename), hq);
+            var stats = fs.statSync(pathToHelpers);
+            if (stats.isFile()) {
+                require(pathToHelpers);
+
+            } else {
+                var files = utils.listFiles(pathToHelpers);
+                files.forEach(function (file) {
+                    require(file);
+                });
+            }
+        });
+
         testQueue.forEach(function (tq) {
             var pathToSpecs = path.resolve(path.dirname(module.parent.filename), tq);
             var stats = fs.statSync(pathToSpecs);
@@ -218,6 +233,26 @@ function run (callback) {
         allParsed = true;
         afterRun();
     }
+}
+
+function helpers (dir) {
+    if (dir === null) {
+        helpersQueue = [];
+
+    } else {
+        if (Array.isArray(dir)) {
+            dir.forEach(function (d) {
+                helpersQueue.push(d);
+            });
+        } else {
+            helpersQueue.push(dir);
+        }
+    }
+
+    return {
+        queue: queue,
+        run: run
+    };
 }
 
 function queue (dir) {
@@ -243,8 +278,13 @@ function unqueue (dir) {
 global.describe = describe;
 global.xdescribe = xdescribe;
 
+// make it easy to switch to feather from jasmine
+global.it = describe;
+global.xit = xdescribe;
+
 module.exports = {
     options: options,
+    helpers: helpers,
     run: run,
     queue: queue,
     unqueue: unqueue

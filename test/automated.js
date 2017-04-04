@@ -3,8 +3,10 @@
  */
 
 var chalk = require('chalk');
-var featherTest = require('../index.js');
 var utils = require('../utils.js');
+
+// require this here FIRST to setup module.parent.filename for later use
+var featherTest = require('../index.js');
 
 // override console.log so we can validate output
 var LOG = {
@@ -14,6 +16,7 @@ var LOG = {
 console.log = function (msg) {
     LOG.history.push(msg);
 };
+console.log.real = LOG.out;
 
 var validate = {
 
