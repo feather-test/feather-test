@@ -1,15 +1,17 @@
-var featherTest = require('../../index.js');
-var chalk = require('chalk');
+var FeatherTest = require('../../index.js');
 
 module.exports = function (LOG, validate, callback) {
     LOG.history = [];
-    featherTest.options.timeout = 100;
-    featherTest.unqueue();
-    featherTest.queue('./timeout');
-    featherTest.run(function () {
+
+    var timeoutTest = new FeatherTest({
+        specs: '../timeout',
+        timeout: 100
+    });
+
+    timeoutTest.run(function () {
         LOG.out('\nWhen Feather Times Out\n');
         validate.all(LOG.history, [
-            chalk.yellow('\nSpec timed out!\n'),
+            '\nSpec timed out!\n',
             'timeout',
             '   is handled properly',
             '      should call done() within 100ms'

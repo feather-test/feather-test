@@ -1,14 +1,16 @@
-var featherTest = require('../../index.js');
-var chalk = require('chalk');
+var FeatherTest = require('../../index.js');
 
 module.exports = function (LOG, validate, callback) {
     LOG.history = [];
-    featherTest.unqueue();
-    featherTest.queue('./modules');
-    featherTest.run(function () {
+
+    var modulesTest = new FeatherTest({
+        specs: '../modules'
+    });
+
+    modulesTest.run(function () {
         LOG.out('\nWhen Feather Mutates Modules\n');
         validate.all(LOG.history, [
-            chalk.green('\nAll 3 tests passed!')
+            '\nAll 3 tests passed!'
         ]);
         callback();
     });

@@ -1,6 +1,6 @@
 # feather-test
 
-**Extremely lightweight test coverage**
+**Extremely lightweight JavaScript test coverage for Node and Browser**
 
 *Refactor safely -- without configuring a heavy test suite*
 
@@ -20,19 +20,6 @@ myProject/
   |--src/
   |  |--etc.
   |--package.json
-```
-
-*myProject/test/run.js*
-```js
-var featherTest = require('feather-test');
-
-// point to the directory that contains your spec files
-// queues tests that are defined within
-featherTest.queue('./specs');
-
-// run all queued tests by calling `run`
-// (can pass an optional callback to be executed after tests finish)
-featherTest.run(callback);
 ```
 
 *myProject/test/specs/one.spec.js*
@@ -77,7 +64,22 @@ describe('teddy ruxpin is the creepiest bear ever', function () {
 }
 ```
 
-## Run Your Tests
+## Run Your Tests in Node.js
+*myProject/test/run.js*
+```js
+var FeatherTest = require('feather-test');
+
+// create a new FeatherTest with your spec files
+var myTests = new FeatherTest({
+    helpers: './helpers',
+    specs: './specs'
+});
+
+// run all queued tests by calling `run`
+// (can pass an optional callback to be executed after tests finish)
+myTests.run(callback);
+```
+
 ```
 $ cd myProject
 $ npm test
@@ -85,11 +87,34 @@ $ npm test
 // All 4 tests passed!
 ```
 
+## Run Your Tests in a Browser
+*myProject/test/run.js*
+```js
+var FeatherTest = require('feather-test');
+
+// create a new FeatherTest with your spec files
+var myTests = new FeatherTest({
+    helpers: './helpers',
+    specs: './specs'
+});
+
+// run all queued tests by calling `run`
+myTests.browser();
+```
+
+```
+$ cd myProject
+$ npm test
+
+// You will be given a URL that you can open in any browser on your machine
+```
+
 ## Spec Methods
 *globally available within spec files*
 
 - describe (can be nested)
 - xdescribe (skips this block and all assertions contained within)
+- it (same as describe, but added to make migrations easier)
 
 ## Available Matchers
 *any of the below can also be negated using not.toBe, etc.*

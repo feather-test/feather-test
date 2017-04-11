@@ -1,13 +1,11 @@
 
-require.cache.mock('../fixture/sub/three.js', { name: 'mocked' });
 var one = require('../fixture/one.js');
-require.cache.mock.stopAll();
 
 describe('one.spec', function () {
 
     describe('uses the intended modules', function (expect) {
         expect(one.two.name).toBe('two');
-        expect(one.three.name).toBe('mocked');
+        expect(one.three.name).toBe('three');
     });
 
     one.two.name = 'mutated';

@@ -2,39 +2,45 @@
  * Run tests and view output
  */
 
-var featherTest = require('../index.js');
+var FeatherTest = require('../index.js');
 
 console.log('\n\n########## Should Pass ##########');
 global.wrongValue = null;
-featherTest.unqueue();
-featherTest.queue('./features');
-
 global.featherHelpers = [];
-featherTest.helpers([
-    './helpers/helper1.js',
-    './helpers/helper2.js'
-]);
-featherTest.helpers('./helpers/globbed');
 
-featherTest.run(function () {
-    featherTest.helpers(null);
+var passingTest = new FeatherTest({
+    helpers: [
+        './helpers/helper1.js',
+        './helpers/helper2.js'
+    ]
+});
+passingTest.queue('./features');
+passingTest.helpers('./helpers/globbed');
+
+passingTest.run(function () {
     console.log('\n\n########## Should Fail ##########');
     global.wrongValue = 666;
-    featherTest.unqueue();
-    featherTest.queue('./features');
 
-    featherTest.run(function () {
+    var failingTest = new FeatherTest({
+        specs: './features'
+    });
+
+    failingTest.run(function () {
         console.log('\n\n########## Should Error ##########');
-        featherTest.unqueue();
-        featherTest.queue('./errors');
 
-        featherTest.run(function () {
+        var erroringTest = new FeatherTest({
+            specs: './errors'
+        });
+
+        erroringTest.run(function () {
             console.log('\n\n########## Should Time Out ##########');
-            featherTest.options.timeout = 500;
-            featherTest.unqueue();
-            featherTest.queue('./timeout');
 
-            featherTest.run();
+            var timingOutTest = new FeatherTest({
+                specs: './timeout',
+                timeout: 500
+            });
+
+            timingOutTest.run();
         });
     });
 });

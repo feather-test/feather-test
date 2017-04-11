@@ -2,7 +2,7 @@
  * Returns available matchers
  */
 
-var utils = require('./utils.js');
+var each = require('./each.js');
 
 var toString = Object.prototype.toString;
 
@@ -32,14 +32,14 @@ function deepMatch (expected, actual) {
         var actualIsEmpty = true;
         var expectedIsEmpty = true;
 
-        utils.each(expected, function (val, prop) {
+        each(expected, function (val, prop) {
             expectedIsEmpty = false;
             if (!deepMatch(val, actual[prop])) {
                 return match = false;
             }
         });
 
-        utils.each(actual, function (val, prop) {
+        each(actual, function (val, prop) {
             actualIsEmpty = false;
             if (!deepMatch(val, expected[prop])) {
                 return match = false;
@@ -57,34 +57,39 @@ function deepMatch (expected, actual) {
     }
 }
 
-function resultMessage (matcher, actual, expected, tab, neg, msg, printType) {
+function resultMessage (matcher, actual, expected, tab, neg, msg, lineMap, printType) {
     var _actual = _typeof(actual);
     var _expected = _typeof(expected);
     var ptype = printType && _actual !== _expected;
-    return '%%-----' + (msg ? '\n%%' + msg : '') + '\n%%expected\n%%' + tab + toStr(actual, ptype) + '\n%%' + neg + matcher + '\n%%' + tab + toStr(expected, ptype);
+    return '' +
+        '%%-----' + (lineMap ? '\n%%' + lineMap : '') +
+        (msg ? '\n%%' + msg : '') +
+        '\n%%expected\n%%' + tab + toStr(actual, ptype) +
+        '\n%%' + neg + matcher +
+        '\n%%' + tab + toStr(expected, ptype);
 }
 
-function get (currentTest, tab, actual, recordResult, negated) {
+function get (currentTest, tab, actual, lineMap, recordResult, negated) {
     var neg = negated ? 'not ' : '';
     return {
         toBe: function (expected, msg) {
-            var result = resultMessage('to be', actual, expected, tab, neg, msg, true);
+            var result = resultMessage('to be', actual, expected, tab, neg, msg, lineMap, true);
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
         },
         toBeGreaterThan: function (expected, msg) {
-            var result = resultMessage('to be greater than', actual, expected, tab, neg, msg);
+            var result = resultMessage('to be greater than', actual, expected, tab, neg, msg, lineMap);
             recordResult(currentTest, actual > expected, negated, result);
         },
         toBeLessThan: function (expected, msg) {
-            var result = resultMessage('to be less than', actual, expected, tab, neg, msg);
+            var result = resultMessage('to be less than', actual, expected, tab, neg, msg, lineMap);
             recordResult(currentTest, actual < expected, negated, result);
         },
         toContain: function (expected, msg) {
-            var result = resultMessage('to contain', actual, expected, tab, neg, msg);
+            var result = resultMessage('to contain', actual, expected, tab, neg, msg, lineMap);
             recordResult(currentTest, actual.indexOf(expected) !== -1, negated, result);
         },
         toEqual: function (expected, msg) {
-            var result = resultMessage('to equal', actual, expected, tab, neg, msg, true);
+            var result = resultMessage('to equal', actual, expected, tab, neg, msg, lineMap, true);
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
         }
     }
