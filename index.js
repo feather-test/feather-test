@@ -48,7 +48,7 @@ function createBundleThenRun (relativeTo, options, done) {
     utils.each(options.specs, requireFile);
 
     concat += '\n// report results\n';
-    concat += 'featherTest.report();';
+    concat += 'featherTest.report(global.FeatherTestBrowserCallback);';
 
     var testBundle = bundlPack({}).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
         name: 'test.js',
@@ -156,12 +156,13 @@ function FeatherTest (config) {
         }
     };
 
-    this.browser = function () {
+    this.browser = function (callback) {
         var options = this.config;
         var relativeTo = this._relativeTo || discoverRelativePath(new Error());
 
         createBundleThenRun(relativeTo, options, function (testBundle) {
             nodeAsBrowser.init(global);
+            global.FeatherTestBrowserCallback = callback;
             require(testBundle.js);
 
             console.log('Run your test by opening: ' + testBundle.html);

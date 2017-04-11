@@ -52,8 +52,10 @@ passing(LOG, validate, function () {
         modules(LOG, validate, function () {
             errors(LOG, validate, function () {
                 timeout(LOG, validate, function () {
-                    console.log = LOG.out;
-                    browser();
+                    browser(LOG, validate, function () {
+                        console.log = LOG.out;
+                        console.log('\nALL DONE\n');
+                    });
                 });
             });
         });
