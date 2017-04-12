@@ -60,8 +60,8 @@ function FeatherTest (options) {
 
         var expect = function (actual) {
             var lineMap = getLineMap(new Error());
-            var finalMatchers = matchers.get(this, tab, actual, lineMap, recordResult);
-            finalMatchers.not = matchers.get(this, tab, actual, lineMap, recordResult, true);
+            var finalMatchers = matchers.get(this, options, tab, actual, lineMap, recordResult);
+            finalMatchers.not = matchers.get(this, options, tab, actual, lineMap, recordResult, true);
             return finalMatchers;
         }
 

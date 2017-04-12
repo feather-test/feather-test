@@ -10,4 +10,5 @@ describe('matchers', function (expect) {
     expect(99).toBeGreaterThan(global.wrongValue || 1);
     expect(999).toBeLessThan(global.wrongValue || 1000);
     expect('abc123def').toContain(global.wrongValue || '123');
+    expect(123).myCustomMatcher(global.wrongValue || 369);
 });

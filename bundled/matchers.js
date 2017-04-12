@@ -69,9 +69,9 @@ function resultMessage (matcher, actual, expected, tab, neg, msg, lineMap, print
         '\n%%' + tab + toStr(expected, ptype);
 }
 
-function get (currentTest, tab, actual, lineMap, recordResult, negated) {
+function get (currentTest, options, tab, actual, lineMap, recordResult, negated) {
     var neg = negated ? 'not ' : '';
-    return {
+    var builtInMatchers = {
         toBe: function (expected, msg) {
             var result = resultMessage('to be', actual, expected, tab, neg, msg, lineMap, true);
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
@@ -92,7 +92,17 @@ function get (currentTest, tab, actual, lineMap, recordResult, negated) {
             var result = resultMessage('to equal', actual, expected, tab, neg, msg, lineMap, true);
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
         }
-    }
+    };
+
+    var customMatchers = {};
+    each(options.customMatchers, function (customMatcher) {
+        customMatchers[customMatcher.name] = function (expected, msg) {
+            var result = resultMessage(customMatcher.message, actual, expected, tab, neg, msg, lineMap, customMatcher.printType);
+            recordResult(currentTest, customMatcher.matcher(expected, actual), negated, result);
+        };
+    });
+
+    return Object.assign({}, builtInMatchers, customMatchers);
 }
 
 module.exports = {

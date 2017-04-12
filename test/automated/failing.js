@@ -5,7 +5,16 @@ module.exports = function (LOG, validate, callback) {
     global.wrongValue = 666;
 
     var failingTest = new FeatherTest({
-        specs: '../features'
+        specs: '../features',
+        customMatchers: [
+            {
+                name: 'myCustomMatcher',
+                message: 'to be custom',
+                matcher: function (expected, actual) {
+                    return actual * 3 === expected;
+                }
+            }
+        ]
     });
 
     failingTest.run(function () {
@@ -15,6 +24,7 @@ module.exports = function (LOG, validate, callback) {
             'Failed tests:',
             '',
             'matchers',
+            '*',
             '*',
             '*',
             '*',

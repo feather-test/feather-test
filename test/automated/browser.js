@@ -7,6 +7,15 @@ module.exports = function (LOG, validate, callback) {
         helpers: [
             '../helpers/helper1.js',
             '../helpers/helper2.js'
+        ],
+        customMatchers: [
+            {
+                name: 'myCustomMatcher',
+                message: 'to be custom',
+                matcher: function (expected, actual) {
+                    return actual * 3 === expected;
+                }
+            }
         ]
     });
 

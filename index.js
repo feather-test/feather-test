@@ -1,5 +1,6 @@
 const bundlPack = require('bundl-pack');
 const fs = require('fs');
+const jsonfn = require('./bundled/jsonfn.js');
 const nodeAsBrowser = require('node-as-browser');
 const opn = require('./lib/opn.js');
 const path = require('path');
@@ -37,8 +38,9 @@ function createBundleThenRun (relativeTo, options, done) {
     }
 
     concat += '// setup feather-test-runner\n';
+    concat += 'var featherTestOptions = JSON.parse("' + jsonfn.stringify(options) + '", ' + jsonfn.parse.toString() + ');\n';
     concat += 'var FeatherTestRunner = require("' + featherRunner + '");\n';
-    concat += 'var featherTest = new FeatherTestRunner(' + JSON.stringify(options, null, 4) + ');\n';
+    concat += 'var featherTest = new FeatherTestRunner(featherTestOptions);\n';
     concat += 'featherTest.listen();\n'
 
     concat += '\n// load your helpers\n';
