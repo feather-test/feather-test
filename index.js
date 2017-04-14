@@ -167,7 +167,7 @@ function FeatherTest (config) {
             global.FeatherTestBrowserCallback = callback;
             require(testBundle.js);
 
-            console.log('Run your test by opening: ' + testBundle.html);
+            console.log('Run your test in any browser: ' + testBundle.html);
             if (options['browser-open']) {
                 opn(testBundle.html);
             }

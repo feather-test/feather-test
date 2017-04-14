@@ -49,6 +49,11 @@ function FeatherTest (options) {
             pendingSync++;
         }
 
+        // optional setup
+        if (typeof options.beforeEach === 'function') {
+            options.beforeEach();
+        }
+
         // preserve labels from parent describes
         expectContext.labels.push(label);
 
@@ -119,20 +124,33 @@ function FeatherTest (options) {
             this.containsExpectations = false;
         }
 
+        // optional teardown
+        if (typeof options.afterEach === 'function') {
+            options.afterEach();
+        }
+
         afterRun();
     }
 
     function getLineMap (err) {
         if (err.stack) {
-            var line = err.stack.split('\n')[2];
-            if (line.indexOf(' (') !== -1) {
-                line = line.split(' (')[1];
-                line = line.substring(0, line.length - 1);
-            } else {
-                line = line.split('at ')[1];
+            var line = '';
+            var arr = err.stack.split('\n');
+
+            // shift until we find "expect"
+            while (line.indexOf('expect') === -1) {
+                line = arr.shift();
             }
 
-            return '@' + line;
+            // shift one more to get to the real line that threw
+            line = arr.shift();
+
+            // shift past "[native code]" lines (thanks Safari)
+            while (line.indexOf('[native') === 0) {
+                line = arr.shift();
+            }
+
+            return '@' + line.replace(/ *at |\@/, '');
         }
 
         return '';

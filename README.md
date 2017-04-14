@@ -127,3 +127,38 @@ $ npm test
 
 ## Mocks
 Any required module can be mocked. [Learn how to mock modules](https://github.com/seebigs/feather-test/wiki/How-to-mock-modules)
+
+## Options
+`new FeatherTest(options)`
+
+### beforeEach
+A function to execute before each describe
+
+### afterEach
+A function to execute after each describe
+
+### customMatchers
+An array of matchers to add to the expect() return object
+```js
+customMatchers: [
+    {
+        name: 'toMatchCustom',
+        message: 'to match custom things',
+        matcher: function (expected, actual) {
+            return expected === actual * 3;
+        }
+    }
+]
+```
+
+### helpers
+Files (or a directory of files) to load before your specs
+
+### specs
+The files (or a directory of files) that contain your specs
+
+### stopAfterFistFailure
+If set to `true` specs will halt execution after the first spec fails
+
+### timeout
+How long (in ms) to wait for an async describe to call `done()`

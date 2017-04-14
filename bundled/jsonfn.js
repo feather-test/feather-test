@@ -2,7 +2,7 @@
 function stringify (obj) {
     return JSON.stringify(obj, function (key, value) {
         return (typeof value === 'function' ) ? value.toString() : value;
-    }).replace(/\\n/g, ' ').replace(/"/g, '\\"');
+    }).replace(/\\n */g, ' ').replace(/"/g, '\\"');
 }
 
 function parse (key, value) {

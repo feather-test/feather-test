@@ -2,32 +2,25 @@
  * Returns available matchers
  */
 
+var anythingToString = require('anything-to-string');
 var each = require('./each.js');
 
 var toString = Object.prototype.toString;
 
-function fnReplacer (key, val) {
-    return (typeof val === 'function') ? '[Function]' : val;
-}
-
 function _typeof (thing) {
-    return Object.prototype.toString.call(thing).split(' ').pop().slice(0, -1);
+    return toString.call(thing).split(' ').pop().slice(0, -1);
 }
 
 function toStr (thing, printType) {
-    var str;
-
-    if (typeof thing === 'object') {
-        str = JSON.stringify(thing, fnReplacer);
-    } else {
-        str = thing;
-    }
-
+    var str = anythingToString.stringify(thing);
     return '"' + str + '" ' + (printType ? '{' + _typeof(thing) + '}' : '');
 }
 
 function deepMatch (expected, actual) {
-    if (typeof expected === 'object' && typeof actual === 'object') {
+    if (actual === expected) {
+        return true;
+
+    } else if (typeof expected === 'object' && typeof actual === 'object') {
         var match = true;
         var actualIsEmpty = true;
         var expectedIsEmpty = true;
@@ -52,9 +45,9 @@ function deepMatch (expected, actual) {
 
         return match;
 
-    } else {
-        return actual === expected;
     }
+
+    return false;
 }
 
 function resultMessage (matcher, actual, expected, tab, neg, msg, lineMap, printType) {
@@ -97,8 +90,11 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
     var customMatchers = {};
     each(options.customMatchers, function (customMatcher) {
         customMatchers[customMatcher.name] = function (expected, msg) {
+            var utils = {
+                deepMatch: deepMatch
+            };
             var result = resultMessage(customMatcher.message, actual, expected, tab, neg, msg, lineMap, customMatcher.printType);
-            recordResult(currentTest, customMatcher.matcher(expected, actual), negated, result);
+            recordResult(currentTest, customMatcher.matcher(expected, actual, utils), negated, result);
         };
     });
 
