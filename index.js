@@ -1,4 +1,5 @@
 const bundlPack = require('bundl-pack');
+const clone = require('./bundled/clone.js');
 const fs = require('fs');
 const jsonfn = require('./bundled/jsonfn.js');
 const nodeAsBrowser = require('node-as-browser');
@@ -37,8 +38,11 @@ function createBundleThenRun (relativeTo, options, done) {
         }
     }
 
+    var bundledOptions = clone(options);
+    delete bundledOptions.destDir; // hide full paths from the pubilc bundle
+
     concat += '// setup feather-test-runner\n';
-    concat += 'var featherTestOptions = JSON.parse("' + jsonfn.stringify(options) + '", ' + jsonfn.parse.toString() + ');\n';
+    concat += 'var featherTestOptions = JSON.parse("' + jsonfn.stringify(bundledOptions) + '", ' + jsonfn.parse.toString() + ');\n';
     concat += 'var FeatherTestRunner = require("' + featherRunner + '");\n';
     concat += 'var featherTest = new FeatherTestRunner(featherTestOptions);\n';
     concat += 'featherTest.listen();\n'
@@ -52,7 +56,11 @@ function createBundleThenRun (relativeTo, options, done) {
     concat += '\n// report results\n';
     concat += 'featherTest.report(global.FeatherTestBrowserCallback);';
 
-    var testBundle = bundlPack({}).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
+    var testBundleOptions = {
+        leadingComments: false,
+        obscure: true
+    };
+    var testBundle = bundlPack(testBundleOptions).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
         name: 'test.js',
         contents: concat,
         src: [],
