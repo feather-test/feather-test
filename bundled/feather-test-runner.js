@@ -178,7 +178,7 @@ function FeatherTest (options) {
 
     shortCircuit = function (withReport) {
         if (withReport) {
-            reporter.report(results, tab);
+            reporter.report(results, tab, options);
         }
         afterRun = function(){};
         shortCircuit = function(){};
@@ -189,7 +189,7 @@ function FeatherTest (options) {
 
     afterRun = function () {
         if (allParsed && !hasPending()) {
-            reporter.report(results, tab);
+            reporter.report(results, tab, options);
             if (typeof pendingCallback === 'function') {
                 pendingCallback();
             }

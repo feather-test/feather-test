@@ -1,5 +1,8 @@
+var outputHistory = '';
 
-function report (results, tab) {
+function report (results, tab, options) {
+    outputHistory = '';
+
     if (results.failed.length) {
         output('');
         output('Failed tests:');
@@ -27,10 +30,19 @@ function report (results, tab) {
     if (results.skipped.length) {
         output('\n(' + results.skipped.length + ' tests skipped)');
     }
+
+    if (options.reporterTargetElement) {
+        var targets = document.querySelectorAll(options.reporterTargetElement);
+        for (var i = 0, len = targets.length; i < len; i++) {
+            targets[i].innerHTML = outputHistory.trim();
+        }
+    }
 }
 
-function output (msg, indent) {
-    console.log(msg.replace(/\%\%/g, indent));
+function output (message, indent) {
+    var msg = message.replace(/\%\%/g, indent);
+    console.log(msg);
+    outputHistory += '\n' + msg;
 }
 
 module.exports = {
