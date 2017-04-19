@@ -4,6 +4,7 @@
 
 var anythingToString = require('anything-to-string');
 var each = require('./each.js');
+var extend = require('./extend.js');
 
 var toString = Object.prototype.toString;
 
@@ -98,7 +99,7 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
         };
     });
 
-    return Object.assign({}, builtInMatchers, customMatchers);
+    return extend({}, builtInMatchers, customMatchers);
 }
 
 module.exports = {
