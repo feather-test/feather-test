@@ -216,13 +216,15 @@ function FeatherTest (options) {
         function spy () {
             spy.calls.push(arguments);
             if (typeof replacement === 'function') {
-                replacement.apply(this, arguments);
+                return replacement.apply(this, arguments);
             }
         }
 
         spy.calls = [];
 
         obj[methodName] = spy;
+
+        return spy;
     }
 
 
