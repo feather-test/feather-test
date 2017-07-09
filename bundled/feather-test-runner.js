@@ -27,6 +27,7 @@ function FeatherTest (options) {
         failed: [],
         skipped: []
     };
+    var spies = [];
 
     function reset () {
         pendingAsync = 0;
@@ -35,6 +36,7 @@ function FeatherTest (options) {
         results.passed = [];
         results.failed = [];
         results.skipped = [];
+        spies = [];
     }
 
 
@@ -124,7 +126,12 @@ function FeatherTest (options) {
             this.containsExpectations = false;
         }
 
-        // optional teardown
+        // teardown
+
+        spies.forEach(function (spy) {
+            spy.obj[spy.methodName] = spy.original;
+        });
+
         if (typeof options.afterEach === 'function') {
             options.afterEach();
         }
@@ -197,6 +204,28 @@ function FeatherTest (options) {
     };
 
 
+    /* SPIES */
+
+    function spyOn (obj, methodName, replacement) {
+        spies.push({
+            obj: obj,
+            methodName: methodName,
+            original: obj[methodName],
+        });
+
+        function spy () {
+            spy.calls.push(arguments);
+            if (typeof replacement === 'function') {
+                replacement.apply(this, arguments);
+            }
+        }
+
+        spy.calls = [];
+
+        obj[methodName] = spy;
+    }
+
+
     /* PUBLIC */
 
     // Activate the test and listen for any describes to be executed
@@ -205,6 +234,7 @@ function FeatherTest (options) {
         root.xdescribe = xdescribe;
         root.it = describe; // make it easy to switch to feather from jasmine
         root.xit = xdescribe;
+        root.spyOn = spyOn;
         reset();
     }
 

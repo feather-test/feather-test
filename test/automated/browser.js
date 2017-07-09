@@ -26,7 +26,7 @@ module.exports = function (LOG, validate, callback) {
         LOG.out('\nWhen Feather runs in Browser Mode\n');
         validate.all(LOG.history, [
             '*',
-            '\nAll 10 tests passed!',
+            '\nAll 13 tests passed!',
             '\n(1 tests skipped)'
         ]);
         callback();
