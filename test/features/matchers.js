@@ -1,7 +1,15 @@
 
+let obj = {
+    method: function () {},
+};
+
 function fn () {}
 
 describe('matchers', function (expect) {
+    spyOn(obj, 'method');
+    obj.method();
+    obj.method(4,5,6);
+
     expect(true).toBe(global.wrongValue || true);
     expect({ a:1, b:{ c:2 } }).toBe(global.wrongValue || { a:1, b:{ c:2 } });
     expect({ fn: fn }).toBe(global.wrongValue || { fn: fn });
@@ -10,5 +18,7 @@ describe('matchers', function (expect) {
     expect(99).toBeGreaterThan(global.wrongValue || 1);
     expect(999).toBeLessThan(global.wrongValue || 1000);
     expect('abc123def').toContain(global.wrongValue || '123');
+    expect(obj.method).toHaveBeenCalled();
+    expect(obj.method).toHaveBeenCalledWith(4,5,6);
     expect(123).myCustomMatcher(global.wrongValue || 369);
 });

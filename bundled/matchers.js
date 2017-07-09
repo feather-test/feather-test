@@ -51,7 +51,7 @@ function deepMatch (expected, actual) {
     return false;
 }
 
-function resultMessage (matcher, actual, expected, tab, neg, msg, lineMap, printType) {
+function resultMessage (actual, matcher, expected, tab, neg, msg, lineMap, printType) {
     var _actual = _typeof(actual);
     var _expected = _typeof(expected);
     var ptype = printType && _actual !== _expected;
@@ -67,25 +67,48 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
     var neg = negated ? 'not ' : '';
     var builtInMatchers = {
         toBe: function (expected, msg) {
-            var result = resultMessage('to be', actual, expected, tab, neg, msg, lineMap, true);
+            var result = resultMessage(actual, 'to be', expected, tab, neg, msg, lineMap, true);
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
         },
         toBeGreaterThan: function (expected, msg) {
-            var result = resultMessage('to be greater than', actual, expected, tab, neg, msg, lineMap);
+            var result = resultMessage(actual, 'to be greater than', expected, tab, neg, msg, lineMap);
             recordResult(currentTest, actual > expected, negated, result);
         },
         toBeLessThan: function (expected, msg) {
-            var result = resultMessage('to be less than', actual, expected, tab, neg, msg, lineMap);
+            var result = resultMessage(actual, 'to be less than', expected, tab, neg, msg, lineMap);
             recordResult(currentTest, actual < expected, negated, result);
         },
         toContain: function (expected, msg) {
-            var result = resultMessage('to contain', actual, expected, tab, neg, msg, lineMap);
+            var result = resultMessage(actual, 'to contain', expected, tab, neg, msg, lineMap);
             recordResult(currentTest, actual.indexOf(expected) !== -1, negated, result);
         },
         toEqual: function (expected, msg) {
-            var result = resultMessage('to equal', actual, expected, tab, neg, msg, lineMap, true);
+            var result = resultMessage(actual, 'to equal', expected, tab, neg, msg, lineMap, true);
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
-        }
+        },
+        toHaveBeenCalled: function () {
+            if (actual.name !== 'spy') { throw new Error('toHaveBeenCalled requires a spy'); }
+            var result = resultMessage(actual.original.name || actual.original, 'to have been called', 'at least once', tab, neg, null, lineMap);
+            recordResult(currentTest, actual.calls.length > 0, negated, result);
+        },
+        toHaveBeenCalledWith: function () {
+            if (actual.name !== 'spy') { throw new Error('toHaveBeenCalledWith requires a spy'); }
+            var args = Array.prototype.slice.call(arguments);
+            var matchingCallFound = false;
+            each(actual.calls, function (call) {
+                var argsMatch = true;
+                each(args, function (arg, index) {
+                    if (call[index] !== arg) {
+                        argsMatch = false;
+                    }
+                });
+                if (argsMatch) {
+                    matchingCallFound = true;
+                }
+            });
+            var result = resultMessage(actual.original.name || actual.original, 'to have been called with', args, tab, neg, null, lineMap);
+            recordResult(currentTest, matchingCallFound, negated, result);
+        },
     };
 
     var customMatchers = {};
@@ -94,7 +117,7 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
             var utils = {
                 deepMatch: deepMatch
             };
-            var result = resultMessage(customMatcher.message, actual, expected, tab, neg, msg, lineMap, customMatcher.printType);
+            var result = resultMessage(actual, customMatcher.message, expected, tab, neg, msg, lineMap, customMatcher.printType);
             recordResult(currentTest, customMatcher.matcher(expected, actual, utils), negated, result);
         };
     });

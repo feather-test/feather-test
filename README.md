@@ -2,7 +2,7 @@
 
 **Extremely lightweight JavaScript test coverage for Node and Browser**
 
-*Refactor safely -- without configuring a heavy test suite*
+*Refactor safely -- without configuring a burdensome test suite*
 
 ## Install
 ```
@@ -115,6 +115,7 @@ $ npm test
 - describe (can be nested)
 - xdescribe (skips this block and all assertions contained within)
 - it (same as describe, but added to make migrations easier)
+- spyOn (watches, stubs, or mocks any function or method)
 
 ## Available Matchers
 *any of the below can also be negated using not.toBe, etc.*
@@ -124,8 +125,34 @@ $ npm test
 - toBeLessThan
 - toContain
 - toEqual
+- toHaveBeenCalled
+- toHaveBeenCalledWith
 
-## Mocks
+## Spies
+Stub or mock any function or method. `spyOn` watches and counts each invocation.
+```js
+describe('no double agents here', function (expect) {
+    let obj = {
+        method: function () {
+            return 'original';
+        }
+    };
+
+    expect(obj.method()).toBe('original');
+
+    describe('put on your disguise', function (expect) {
+        spyOn(obj, 'method', function () {
+            return 'impostor';
+        });
+        expect(obj.method()).toBe('impostor');
+    });
+
+    // spies are reset after the containing describe is done
+    expect(obj.method()).toBe('original');
+});
+```
+
+## Mock Modules
 Any required module can be mocked. [Learn how to mock modules](https://github.com/seebigs/feather-test/wiki/How-to-mock-modules)
 
 ## Options

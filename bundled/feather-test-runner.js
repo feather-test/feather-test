@@ -207,10 +207,12 @@ function FeatherTest (options) {
     /* SPIES */
 
     function spyOn (obj, methodName, replacement) {
+        let original = obj[methodName];
+
         spies.push({
-            obj: obj,
-            methodName: methodName,
-            original: obj[methodName],
+            obj,
+            methodName,
+            original,
         });
 
         function spy () {
@@ -221,6 +223,7 @@ function FeatherTest (options) {
         }
 
         spy.calls = [];
+        spy.original = original;
 
         obj[methodName] = spy;
 
