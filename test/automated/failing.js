@@ -33,6 +33,8 @@ module.exports = function (LOG, validate, callback) {
             '*',
             '*',
             '*',
+            '*',
+            '*',
             '',
             'negated',
             '   when mogwai gets wet',

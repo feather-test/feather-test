@@ -6,9 +6,12 @@ let obj = {
 function fn () {}
 
 describe('matchers', function (expect) {
-    spyOn(obj, 'method');
-    obj.method();
-    obj.method(4,5,6);
+    spy.on(obj, 'method');
+
+    if (!global.wrongValue) {
+        obj.method();
+        obj.method(4,5,6);
+    }
 
     expect(true).toBe(global.wrongValue || true);
     expect({ a:1, b:{ c:2 } }).toBe(global.wrongValue || { a:1, b:{ c:2 } });
@@ -19,6 +22,6 @@ describe('matchers', function (expect) {
     expect(999).toBeLessThan(global.wrongValue || 1000);
     expect('abc123def').toContain(global.wrongValue || '123');
     expect(obj.method).toHaveBeenCalled();
-    expect(obj.method).toHaveBeenCalledWith(4,5,6);
+    expect(obj.method).toHaveBeenCalledWith(4,5,any(Number));
     expect(123).myCustomMatcher(global.wrongValue || 369);
 });

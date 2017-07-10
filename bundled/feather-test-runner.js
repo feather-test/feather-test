@@ -206,7 +206,22 @@ function FeatherTest (options) {
 
     /* SPIES */
 
-    function spyOn (obj, methodName, replacement) {
+    function Spy (original = function(){}, replacement) {
+        function spy () {
+            let args = Array.prototype.slice.call(arguments);
+            spy.calls.push(args);
+            if (typeof replacement === 'function') {
+                return replacement.apply(this, args);
+            }
+        }
+
+        spy.calls = [];
+        spy.original = original;
+
+        return spy;
+    }
+
+    Spy.on = function (obj, methodName, replacement) {
         let original = obj[methodName];
 
         spies.push({
@@ -215,19 +230,27 @@ function FeatherTest (options) {
             original,
         });
 
-        function spy () {
-            spy.calls.push(arguments);
-            if (typeof replacement === 'function') {
-                return replacement.apply(this, arguments);
-            }
-        }
-
-        spy.calls = [];
-        spy.original = original;
+        var spy = Spy(original, replacement);
 
         obj[methodName] = spy;
 
         return spy;
+    };
+
+
+    /* ANY */
+
+    function Any (type) {
+        this.Any = type.name;
+        this.constructor = type;
+    }
+
+    Any.prototype.toString = function () {
+        return 'fooooo';
+    };
+
+    function any (constructor) {
+        return new Any(constructor);
     }
 
 
@@ -239,7 +262,8 @@ function FeatherTest (options) {
         root.xdescribe = xdescribe;
         root.it = describe; // make it easy to switch to feather from jasmine
         root.xit = xdescribe;
-        root.spyOn = spyOn;
+        root.spy = Spy;
+        root.any = any;
         reset();
     }
 

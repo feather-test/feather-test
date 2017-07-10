@@ -13,11 +13,19 @@ function _typeof (thing) {
 }
 
 function toStr (thing, printType) {
+    if (thing && thing.isAny){ return 'Any ' + thing.type.name; }
     var str = anythingToString.stringify(thing);
     return '"' + str + '" ' + (printType ? '{' + _typeof(thing) + '}' : '');
 }
 
 function deepMatch (expected, actual) {
+    if (expected && expected.Any) {
+        return _typeof(actual) === _typeof(expected.constructor())
+    }
+    if (actual && actual.Any) {
+        return _typeof(expected) === _typeof(actual.constructor())
+    }
+
     if (actual === expected) {
         return true;
 
@@ -87,18 +95,18 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
             recordResult(currentTest, deepMatch(expected, actual), negated, result);
         },
         toHaveBeenCalled: function () {
-            if (actual.name !== 'spy') { throw new Error('toHaveBeenCalled requires a spy'); }
-            var result = resultMessage(actual.original.name || actual.original, 'to have been called', 'at least once', tab, neg, null, lineMap);
+            if (!actual || actual.name !== 'spy') { throw new Error('toHaveBeenCalled requires a spy'); }
+            var result = resultMessage(actual.original.name || 'anonymous', 'to have been called', 'at least once', tab, neg, null, lineMap);
             recordResult(currentTest, actual.calls.length > 0, negated, result);
         },
         toHaveBeenCalledWith: function () {
-            if (actual.name !== 'spy') { throw new Error('toHaveBeenCalledWith requires a spy'); }
-            var args = Array.prototype.slice.call(arguments);
+            if (!actual || actual.name !== 'spy') { throw new Error('toHaveBeenCalledWith requires a spy'); }
+            var expectedArgs = Array.prototype.slice.call(arguments);
             var matchingCallFound = false;
             each(actual.calls, function (call) {
                 var argsMatch = true;
-                each(args, function (arg, index) {
-                    if (call[index] !== arg) {
+                each(expectedArgs, function (arg, index) {
+                    if (!deepMatch(arg, call[index])) {
                         argsMatch = false;
                     }
                 });
@@ -106,7 +114,8 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
                     matchingCallFound = true;
                 }
             });
-            var result = resultMessage(actual.original.name || actual.original, 'to have been called with', args, tab, neg, null, lineMap);
+            var actualMessage = (actual.original.name || 'anonymous') + ' ' + anythingToString.stringify(actual.calls);
+            var result = resultMessage(actualMessage, 'to have been called with', expectedArgs, tab, neg, null, lineMap);
             recordResult(currentTest, matchingCallFound, negated, result);
         },
     };

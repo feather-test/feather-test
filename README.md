@@ -115,7 +115,7 @@ $ npm test
 - describe (can be nested)
 - xdescribe (skips this block and all assertions contained within)
 - it (same as describe, but added to make migrations easier)
-- spyOn (watches, stubs, or mocks any function or method)
+- spy (watches, stubs, or mocks any function or method)
 
 ## Available Matchers
 *any of the below can also be negated using not.toBe, etc.*
@@ -129,7 +129,7 @@ $ npm test
 - toHaveBeenCalledWith
 
 ## Spies
-Stub or mock any function or method. `spyOn` watches and counts each invocation.
+Stub or mock any function or method. `spy.on()` watches and counts each invocation. `spy()` creates a new spy.
 ```js
 describe('no double agents here', function (expect) {
     let obj = {
@@ -141,7 +141,7 @@ describe('no double agents here', function (expect) {
     expect(obj.method()).toBe('original');
 
     describe('put on your disguise', function (expect) {
-        spyOn(obj, 'method', function () {
+        spy.on(obj, 'method', function () {
             return 'impostor';
         });
         expect(obj.method()).toBe('impostor');

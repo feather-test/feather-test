@@ -12,7 +12,7 @@ describe('spy', function () {
         describe('replaces original behavior and restores when done', function (expect) {
             expect(originalCalled).toBe(0);
             expect(replacementCalled).toBe(0);
-            let spiedMethod = spyOn(obj, 'method', function (arg) {
+            let spiedMethod = spy.on(obj, 'method', function (arg) {
                 replacementCalled += arg;
             });
             obj.method(1);
@@ -29,7 +29,7 @@ describe('spy', function () {
         let obj = {
             method: function(){}
         };
-        let spiedMethod = spyOn(obj, 'method');
+        let spiedMethod = spy.on(obj, 'method');
         obj.method(4,5,6);
         obj.method(7,8,9);
         expect(obj.method.calls).toBe([
@@ -40,6 +40,13 @@ describe('spy', function () {
             [4,5,6],
             [7,8,9],
         ]);
+    });
+
+    describe('can be created from scratch', function (expect) {
+        let s = spy();
+        expect(typeof s).toBe('function');
+        expect(s.name).toBe('spy');
+        expect(s.calls).toBe([]);
     });
 
 });
