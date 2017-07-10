@@ -26,7 +26,7 @@ module.exports = function (LOG, validate, callback) {
     passingTest.run(function () {
         LOG.out('\nWhen Feather is Passing\n');
         validate.all(LOG.history, [
-            '\nAll 15 tests passed!',
+            '\nAll 17 tests passed!',
             '\n(1 tests skipped)'
         ]);
         callback();

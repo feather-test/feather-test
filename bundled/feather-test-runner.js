@@ -13,7 +13,8 @@ function FeatherTest (options) {
     var afterRun;
     var allParsed;
     var expectContext = {
-        labels: []
+        depth: 0,
+        labels: [],
     };
 
 
@@ -25,7 +26,7 @@ function FeatherTest (options) {
     var results = {
         passed: [],
         failed: [],
-        skipped: []
+        skipped: [],
     };
     var spies = [];
 
@@ -51,10 +52,8 @@ function FeatherTest (options) {
             pendingSync++;
         }
 
-        // optional setup
-        if (typeof options.beforeEach === 'function') {
-            options.beforeEach();
-        }
+        // keep track of how nested we are
+        expectContext.depth++;
 
         // preserve labels from parent describes
         expectContext.labels.push(label);
@@ -63,6 +62,11 @@ function FeatherTest (options) {
         expectContext.passedExpectations = [];
         expectContext.failedExpectations = [];
         expectContext.containsExpectations = false;
+
+        // optional setup
+        if (typeof options.beforeEach === 'function') {
+            options.beforeEach();
+        }
 
 
         var expect = function (actual) {
@@ -89,17 +93,25 @@ function FeatherTest (options) {
             }, options.timeout);
         }
 
+        function cleanupContext () {
+            (spies[expectContext.depth] || []).forEach(function (spy) {
+                spy.obj[spy.methodName] = spy.original;
+            });
+            expectContext.depth--;
+            expectContext.labels.pop();
+        }
+
         try {
             assertions.apply(clonedExpectContext, assertionArgs);
         } catch (err) {
             clonedExpectContext.failedExpectations = []; // clear failed expectations to make room for the error
             recordResult(clonedExpectContext, false, false, '\n' + (err.stack || err));
-            expectContext.labels.pop();
+            cleanupContext();
             describeDone.apply(clonedExpectContext);
             return;
         }
 
-        expectContext.labels.pop();
+        cleanupContext();
         if (!async) {
             describeDone.apply(clonedExpectContext);
         }
@@ -127,11 +139,6 @@ function FeatherTest (options) {
         }
 
         // teardown
-
-        spies.forEach(function (spy) {
-            spy.obj[spy.methodName] = spy.original;
-        });
-
         if (typeof options.afterEach === 'function') {
             options.afterEach();
         }
@@ -223,16 +230,18 @@ function FeatherTest (options) {
 
     Spy.on = function (obj, methodName, replacement) {
         let original = obj[methodName];
+        let spy = Spy(original, replacement);
 
-        spies.push({
-            obj,
-            methodName,
-            original,
-        });
+        if (original) {
+            spies[expectContext.depth] = spies[expectContext.depth] || [];
+            spies[expectContext.depth].push({
+                obj,
+                methodName,
+                original,
+            });
 
-        var spy = Spy(original, replacement);
-
-        obj[methodName] = spy;
+            obj[methodName] = spy;
+        }
 
         return spy;
     };
@@ -254,16 +263,80 @@ function FeatherTest (options) {
     }
 
 
+    /* CLOCK */
+
+    let clock = {
+        _setTimeout: setTimeout,
+        _setInterval: setInterval,
+        _timer: 0,
+        _delayedActions: [],
+
+        install: function () {
+            if (setTimeout.name !=  'spy') {
+                spy.on(global, 'setTimeout', function (fn, delay) {
+                    if (typeof fn === 'function') {
+                        clock._delayedActions.push({
+                            timestamp: clock._timer,
+                            delay: delay,
+                            fn: fn,
+                        });
+                    }
+                });
+            }
+
+            if (setInterval.name !=  'spy') {
+                spy.on(global, 'setInterval', function (fn, delay) {
+                    if (typeof fn === 'function') {
+                        clock._delayedActions.push({
+                            timestamp: clock._timer,
+                            delay: delay,
+                            fn: fn,
+                            recurring: true,
+                        });
+                    }
+                });
+            }
+        },
+
+        tick: function (amount) {
+            clock._timer += amount;
+            let toBeDeleted = [];
+            clock._delayedActions.forEach(function (pending, index) {
+                if (pending.recurring) {
+                    let times = Math.floor((clock._timer - pending.timestamp) / pending.delay);
+                    for (let i = 0; i < times; i++) {
+                        pending.fn();
+                    }
+                } else {
+                    if (clock._timer - pending.timestamp >= pending.delay) {
+                        toBeDeleted.unshift(index);
+                        pending.fn();
+                    }
+                }
+            });
+            toBeDeleted.forEach(function (index) {
+                clock._delayedActions.splice(index, 1);
+            });
+        },
+
+        uninstall: function () {
+            setTimeout = clock._setTimeout;
+            setInterval = clock._setInterval;
+        },
+    };
+
+
     /* PUBLIC */
 
     // Activate the test and listen for any describes to be executed
     function listen () {
-        root.describe = describe;
-        root.xdescribe = xdescribe;
-        root.it = describe; // make it easy to switch to feather from jasmine
-        root.xit = xdescribe;
-        root.spy = Spy;
         root.any = any;
+        root.clock = clock;
+        root.describe = describe;
+        root.it = describe; // make it easier to switch to feather from jasmine
+        root.spy = Spy;
+        root.xdescribe = xdescribe;
+        root.xit = xdescribe;
         reset();
     }
 

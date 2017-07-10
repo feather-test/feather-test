@@ -1,10 +1,10 @@
 const bundlPack = require('bundl-pack');
 const clone = require('./bundled/clone.js');
 const fs = require('fs');
-const jsonfn = require('./bundled/jsonfn.js');
 const nodeAsBrowser = require('node-as-browser');
 const opn = require('./lib/opn.js');
 const path = require('path');
+const tostring = require('./bundled/tostring.js');
 const utils = require('seebigs-utils');
 
 var featherRunner = path.resolve(__dirname, './bundled/feather-test-runner.js');
@@ -42,7 +42,7 @@ function createBundleThenRun (relativeTo, options, done) {
     delete bundledOptions.destDir; // hide full paths from the pubilc bundle
 
     concat += '// setup feather-test-runner\n';
-    concat += 'var featherTestOptions = JSON.parse("' + jsonfn.stringify(bundledOptions) + '", ' + jsonfn.parse.toString() + ');\n';
+    concat += 'var featherTestOptions = ' + tostring.fromObject(bundledOptions) + '\n';
     concat += 'var FeatherTestRunner = require("' + featherRunner + '");\n';
     concat += 'var featherTest = new FeatherTestRunner(featherTestOptions);\n';
     concat += 'featherTest.listen();\n'
@@ -175,7 +175,7 @@ function FeatherTest (config) {
             global.FeatherTestBrowserCallback = callback;
             require(testBundle.js);
 
-            console.log('Run your test in any browser: ' + testBundle.html);
+            console.log('\nRun your test in any browser: ' + testBundle.html);
             if (options['browser-open']) {
                 opn(testBundle.html);
             }

@@ -15,6 +15,13 @@ describe('spy', function () {
             let spiedMethod = spy.on(obj, 'method', function (arg) {
                 replacementCalled += arg;
             });
+
+            describe('inside1', function () {
+                describe('inside2', function () {
+                    obj.method(1);
+                });
+            });
+
             obj.method(1);
             spiedMethod(1);
             expect(originalCalled).toBe(0);
@@ -22,7 +29,7 @@ describe('spy', function () {
 
         obj.method(1);
         expect(originalCalled).toBe(1);
-        expect(replacementCalled).toBe(2);
+        expect(replacementCalled).toBe(3);
     });
 
     describe('tracks calls and arguments', function (expect) {
