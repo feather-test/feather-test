@@ -18,6 +18,9 @@ function report (results, tab, options) {
         });
         output('');
         output(results.failed.length + ' tests failed!');
+        if (options.exitProcessWhenFailing) {
+            process.exit(1);
+        }
 
     } else if (results.passed.length) {
         output('\nAll ' + results.passed.length + ' tests passed!');

@@ -1,6 +1,7 @@
 const FeatherTest = require('../../index.js');
 
 var testSuite = new FeatherTest({
+    exitProcessWhenFailing: false,
     helpers: [
         '../helpers/helper1.js',
         '../helpers/helper2.js'

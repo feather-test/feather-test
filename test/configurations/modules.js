@@ -1,6 +1,7 @@
 const FeatherTest = require('../../index.js');
 
 var testSuite = new FeatherTest({
+    exitProcessWhenFailing: false,
     specs: '../specs/modules'
 });
 

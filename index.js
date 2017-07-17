@@ -60,6 +60,7 @@ function FeatherTest (config) {
 
     var defaultConfig = {
         helpers: [],
+        exitProcessWhenFailing: true,
         stopAfterFistFailure: false,
         timeout: 5000
     };
