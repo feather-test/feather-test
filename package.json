@@ -27,13 +27,12 @@
   "bugs": {
     "url": "https://github.com/seebigs/feather-test/issues"
   },
+  "devDependencies": {
+    "chalk": "^2.0.1"
+  },
   "dependencies": {
     "anything-to-string": "^0.1.0",
-    "bundl-pack": "^0.6.3",
-    "node-as-browser": "^1.1.3",
-    "seebigs-utils": "^1.4.0"
-  },
-  "devDependencies": {
-    "chalk": "^1.1.3"
+    "discover-source-path": "^0.1.0",
+    "seebigs-utils": "^1.4.1"
   }
 }

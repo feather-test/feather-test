@@ -1,0 +1,1 @@
+window.wrongValue = 666;

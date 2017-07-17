@@ -12,6 +12,7 @@ var LOG = {
 };
 console.log = function (msg) {
     LOG.history.push(msg);
+    // LOG.out(msg);
 };
 console.log.real = LOG.out;
 
@@ -39,23 +40,91 @@ var validate = {
 
 };
 
+const passing = require('./configurations/passing.js');
+const failing = passing;
+const modules = require('./configurations/modules.js');
+const errors = require('./configurations/errors.js');
+const timeout = require('./configurations/timeout.js');
 
-var passing = require('./automated/passing.js');
-var failing = require('./automated/failing.js');
-var modules = require('./automated/modules.js');
-var errors = require('./automated/errors.js');
-var timeout = require('./automated/timeout.js');
-var browser = require('./automated/browser.js');
-
-passing(LOG, validate, function () {
-    failing(LOG, validate, function () {
-        modules(LOG, validate, function () {
-            errors(LOG, validate, function () {
-                timeout(LOG, validate, function () {
-                    browser(LOG, validate, function () {
-                        console.log = LOG.out;
-                        console.log('\nALL DONE\n');
-                    });
+passing(function () {
+    modules(function () {
+        global.wrongValue = 666;
+        failing(function () {
+            delete global.wrongValue;
+            errors(function () {
+                timeout(function () {
+                    console.log = LOG.out;
+                    console.log();
+                    validate.all(LOG.history, [
+'\nAll 17 tests passed!',
+'\n(1 tests skipped)',
+'\nAll 3 tests passed!',
+'\nFailed tests:',
+'',
+'matchers',
+'*',
+'*',
+'*',
+'*',
+'*',
+'*',
+'*',
+'*',
+'*',
+'*',
+'*',
+'',
+'negated',
+'   when mogwai gets wet',
+'      he becomes a gremlin',
+'*',
+'*',
+'',
+'sponge',
+'   when it gets wet',
+'      grows',
+'*',
+'',
+'sponge',
+'   when it gets wet',
+'      does not shrink',
+'*',
+'',
+'sponge',
+'   when it gets wet',
+'*',
+'',
+'sponge',
+'   when it dries out',
+'      shrinks',
+'*',
+'',
+'sponge',
+'   when it dries out',
+'*',
+'',
+'additional outer blocks',
+'*',
+'',
+'async',
+'   asserts expectations now and later',
+'*',
+'*',
+'',
+'9 tests failed!',
+'\n(1 tests skipped)',
+'\nFailed tests:',
+'',
+'handles',
+'   errors in assertions',
+'*',
+'',
+'1 tests failed!',
+'\nSpec timed out!\n',
+'timeout',
+'   is handled properly',
+'      should call done() within 100ms'
+                    ]);
                 });
             });
         });

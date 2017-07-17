@@ -1,0 +1,1 @@
+require('./configurations/modules.js')();

@@ -1,26 +1,17 @@
 # feather-test
 
-**Extremely lightweight JavaScript test coverage for Node and Browser**
+**Extremely lightweight JavaScript test coverage**
 
 *Refactor safely -- without configuring a burdensome test suite*
+
+> Need to test JavaScript for browsers? Use [feather-test-browser](https://github.com/seebigs/feather-test-browser)
 
 ## Install
 ```
 $ npm install feather-test --save-dev
 ```
 
-## Setup
-```
-myProject/
-  |--test/
-  |  |--specs/
-  |  |  |--one.spec.js
-  |  |  |--two.spec.js
-  |  |--run.js
-  |--src/
-  |  |--etc.
-  |--package.json
-```
+## Write Some Tests
 
 *myProject/test/specs/one.spec.js*
 ```js
@@ -64,7 +55,19 @@ describe('teddy ruxpin is the creepiest bear ever', function () {
 }
 ```
 
-## Run Your Tests in Node.js
+```
+myProject/
+  |--test/
+  |  |--specs/
+  |  |  |--one.spec.js
+  |  |  |--two.spec.js
+  |  |--run.js
+  |--src/
+  |  |--etc.
+  |--package.json
+```
+
+## Run Your Tests
 *myProject/test/run.js*
 ```js
 var FeatherTest = require('feather-test');
@@ -76,7 +79,7 @@ var myTests = new FeatherTest({
 });
 
 // run all queued tests by calling `run`
-// (can pass an optional callback to be executed after tests finish)
+// (optional callback will be executed after all tests finish)
 myTests.run(callback);
 ```
 
@@ -87,38 +90,10 @@ $ npm test
 // All 4 tests passed!
 ```
 
-## Run Your Tests in a Browser
-*myProject/test/run.js*
-```js
-var FeatherTest = require('feather-test');
+---
 
-// create a new FeatherTest with your spec files
-var myTests = new FeatherTest({
-    helpers: './helpers',
-    specs: './specs'
-});
-
-// run all queued tests by calling `run`
-myTests.browser();
-```
-
-```
-$ cd myProject
-$ npm test
-
-// You will be given a URL that you can open in any browser on your machine
-```
-
-## Spec Methods
-*globally available within spec files*
-
-- describe (can be nested)
-- xdescribe (skips this block and all assertions contained within)
-- it (same as describe, but added to make migrations easier)
-- spy (watches, stubs, or mocks any function or method)
-
-## Available Matchers
-*any of the below can also be negated using not.toBe, etc.*
+## Matchers
+*Any of the below can also be negated using not.toBe, etc.*
 
 - toBe
 - toBeGreaterThan
@@ -128,7 +103,59 @@ $ npm test
 - toHaveBeenCalled
 - toHaveBeenCalledWith
 
-## Spies
+## Spec Methods
+*The following methods are globally available within spec files*
+
+### describe
+The basic building block of specs. A description explains what features will be tested within. (can be nested)
+```js
+describe('some feature', function () {
+    describe('can do a thing', function (expect) {
+        expect(thing).toBe(true);
+    });
+});
+```
+
+### xdescribe
+Skips this block and all assertions within. Also skips nested describes.
+```js
+xdescribe('not right now', function (expect) {
+    expect(thisBlock).not.toBe('executed');
+});
+```
+
+### it, xit
+Alias for `describe` (above). Added to make migrations easier
+
+### any
+Use with matchers to indicate a match with and object that shares the same constructor
+```js
+expect(result).toBe({
+    eventName: 'activated',
+    timestamp: any(Number)
+});
+```
+
+### clock
+Manage timing events. Installing will add a global override for `setTimeout` and `setInterval`. To advance the clock use `clock.tick(amount)`.
+```js
+describe('overrides setTimeout when installed', function (expect) {
+    clock.install();
+
+    let happened = 0;
+    setTimeout(function () {
+        happened++;
+    }, 2000);
+
+    expect(happened).toBe(0);
+    clock.tick(2000);
+    expect(happened).toBe(1);
+
+    clock.uninstall();
+});
+```
+
+### spy
 Stub or mock any function or method. `spy.on()` watches and counts each invocation. `spy()` creates a new spy.
 ```js
 describe('no double agents here', function (expect) {
@@ -152,11 +179,16 @@ describe('no double agents here', function (expect) {
 });
 ```
 
-## Mock Modules
-Any required module can be mocked. [Learn how to mock modules](https://github.com/seebigs/feather-test/wiki/How-to-mock-modules)
+---
 
-## Options
+## Configuration Options
 `new FeatherTest(options)`
+
+### helpers
+Files (or a directory of files) to load before your specs
+
+### specs
+The files (or a directory of files) that contain your specs
 
 ### beforeEach
 A function to execute before each describe
@@ -177,12 +209,6 @@ customMatchers: [
     }
 ]
 ```
-
-### helpers
-Files (or a directory of files) to load before your specs
-
-### specs
-The files (or a directory of files) that contain your specs
 
 ### stopAfterFistFailure
 If set to `true` specs will halt execution after the first spec fails

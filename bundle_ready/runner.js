@@ -2,9 +2,9 @@ var clone = require('./clone.js');
 var matchers =  require('./matchers.js');
 var reporter = require('./reporter.js');
 
-function FeatherTest (options) {
-    if (!this instanceof FeatherTest) {
-        return new FeatherTest();
+function FeatherTestRunner (options) {
+    if (!this instanceof FeatherTestRunner) {
+        return new FeatherTestRunner();
     }
 
     var root = typeof global !== 'undefined' ? global : window;
@@ -326,13 +326,67 @@ function FeatherTest (options) {
     };
 
 
+    /* EXTERNAL */
+
+    let external = {
+        _queue: [],
+        _waiting: false,
+
+        loadScript: function (absPath, onLoad) {
+            let methodName = 'external.loadScript';
+            if (typeof window === 'undefined') {
+                throw new Error(methodName + ' is only available in browser mode');
+            }
+            if (typeof absPath === 'string') {
+                if (absPath.charAt(0) !== '/') {
+                    throw new Error(methodName + ' requires an absolute path');
+                }
+
+                let target = document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0];
+
+                function doLoad () {
+                    external._waiting = true;
+
+                    var s = document.createElement('script');
+                    s.type = "text/javascript";
+                    s.src = 'file://' + absPath;
+
+                    s.onload = function () {
+                        if (typeof onLoad === 'function') {
+                            onLoad();
+                        }
+
+                        let next = external._queue.shift();
+                        if (next) {
+                            next();
+                        } else {
+                            external._waiting = false;
+                        }
+                    };
+
+                    target.appendChild(s);
+                }
+
+                if (external._waiting) {
+                    external._queue.push(doLoad);
+                } else {
+                    doLoad();
+                }
+            }
+        },
+
+    };
+
+
     /* PUBLIC */
 
     // Activate the test and listen for any describes to be executed
     function listen () {
+        root.__dirname = '/';
         root.any = any;
         root.clock = clock;
         root.describe = describe;
+        root.external = external;
         root.it = describe; // make it easier to switch to feather from jasmine
         root.spy = Spy;
         root.xdescribe = xdescribe;
@@ -355,4 +409,4 @@ function FeatherTest (options) {
 }
 
 
-module.exports = FeatherTest;
+module.exports = FeatherTestRunner;

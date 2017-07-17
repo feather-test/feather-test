@@ -4,8 +4,7 @@ function report (results, tab, options) {
     outputHistory = '';
 
     if (results.failed.length) {
-        output('');
-        output('Failed tests:');
+        output('\nFailed tests:');
         results.failed.forEach(function (failure) {
             var indent = '';
             output('');
