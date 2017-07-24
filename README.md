@@ -203,14 +203,14 @@ customMatchers: [
     {
         name: 'toMatchCustom',
         message: 'to match custom things',
-        matcher: function (expected, actual) {
+        matcher: function (expected, actual, utils) {
             return expected === actual * 3;
         }
     }
 ]
 ```
 
-### stopAfterFistFailure
+### stopAfterFirstFailure
 If set to `true` specs will halt execution after the first spec fails
 
 ### timeout
