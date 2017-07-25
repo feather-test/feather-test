@@ -24,4 +24,13 @@ describe('matchers', function (expect) {
     expect(obj.method).toHaveBeenCalled();
     expect(obj.method).toHaveBeenCalledWith(4,5,any(Number));
     expect(123).myCustomMatcher(global.wrongValue || 369);
+
+    describe('toContain', function () {
+        expect('thesuperbowl').toContain('superb');
+        expect([1, 2, '3']).toContain('3');
+        expect([1, 2, 3]).toContain(3);
+        expect([1, 2, 3]).toContain([3]);
+        expect([1, 2, 3]).not.toContain([3, 4]);
+        expect([1, 2, 3]).toContain([1, 2, 3]);
+    });
 });
