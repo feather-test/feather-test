@@ -88,7 +88,17 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
         },
         toContain: function (expected, msg) {
             var result = resultMessage(actual, 'to contain', expected, tab, neg, msg, lineMap);
-            recordResult(currentTest, actual.indexOf(expected) !== -1, negated, result);
+            var containsExpected = true;
+            if (typeof actual === 'string') {
+                containsExpected = actual.indexOf(expected) !== -1;
+            } else {
+                each(expected, function (v) {
+                    if (actual.indexOf(v) === -1) {
+                        return containsExpected = false;
+                    }
+                })
+            }
+            recordResult(currentTest, containsExpected, negated, result);
         },
         toEqual: function (expected, msg) {
             var result = resultMessage(actual, 'to equal', expected, tab, neg, msg, lineMap, true);
