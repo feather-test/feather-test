@@ -1,4 +1,5 @@
 const discoverSourcePath = require('discover-source-path');
+const each = require('./bundle_ready/each.js');
 const FeatherRunner = require('./bundle_ready/runner.js');
 const fs = require('fs');
 const path = require('path');
@@ -34,10 +35,10 @@ function runInNode (relativeTo, options, done) {
     runner.listen();
 
     // load your helpers
-    utils.each(options.helpers, requireFile);
+    each(options.helpers, requireFile);
 
     // run your specs
-    utils.each(options.specs, requireFile);
+    each(options.specs, requireFile);
 
     // report results
     runner.report(done);

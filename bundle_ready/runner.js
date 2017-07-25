@@ -1,4 +1,5 @@
 var clone = require('./clone.js');
+var each = require('./each.js');
 var matchers =  require('./matchers.js');
 var reporter = require('./reporter.js');
 
@@ -266,60 +267,79 @@ function FeatherTestRunner (options) {
     /* CLOCK */
 
     let clock = {
+        _clearTimeout: clearTimeout,
+        _clearInterval: clearInterval,
         _setTimeout: setTimeout,
         _setInterval: setInterval,
+        _guid: 0,
         _timer: 0,
-        _delayedActions: [],
+        _delayedActions: {},
 
         install: function () {
-            if (setTimeout.name !=  'spy') {
+            if (setTimeout.name !== 'spy') {
                 spy.on(global, 'setTimeout', function (fn, delay) {
                     if (typeof fn === 'function') {
-                        clock._delayedActions.push({
+                        clock._guid++;
+                        clock._delayedActions[clock._guid] = {
                             timestamp: clock._timer,
-                            delay: delay,
+                            delay: delay || 0,
                             fn: fn,
-                        });
+                        };
+                        return clock._guid;
                     }
                 });
             }
 
-            if (setInterval.name !=  'spy') {
+            if (clearTimeout.name !== 'spy') {
+                spy.on(global, 'clearTimeout', function (id) {
+                    delete clock._delayedActions[id];
+                });
+            }
+
+            if (setInterval.name !== 'spy') {
                 spy.on(global, 'setInterval', function (fn, delay) {
                     if (typeof fn === 'function') {
-                        clock._delayedActions.push({
+                        clock._guid++;
+                        clock._delayedActions[clock._guid] = {
                             timestamp: clock._timer,
-                            delay: delay,
+                            delay: delay || 0,
                             fn: fn,
                             recurring: true,
-                        });
+                        };
+                        return clock._guid;
                     }
+                });
+            }
+
+            if (clearInterval.name !== 'spy') {
+                spy.on(global, 'clearInterval', function (id) {
+                    delete clock._delayedActions[id];
                 });
             }
         },
 
         tick: function (amount) {
             clock._timer += amount;
-            let toBeDeleted = [];
-            clock._delayedActions.forEach(function (pending, index) {
-                if (pending.recurring) {
-                    let times = Math.floor((clock._timer - pending.timestamp) / pending.delay);
-                    for (let i = 0; i < times; i++) {
-                        pending.fn();
-                    }
-                } else {
-                    if (clock._timer - pending.timestamp >= pending.delay) {
-                        toBeDeleted.unshift(index);
-                        pending.fn();
+            each(clock._delayedActions, function (action, id) {
+                if (action) {
+                    if (action.recurring) {
+                        let times = Math.floor((clock._timer - action.timestamp) / action.delay);
+                        for (let i = 0; i < times; i++) {
+                            action.fn();
+                        }
+                    } else {
+                        if (clock._timer - action.timestamp >= action.delay) {
+                            delete clock._delayedActions[id];
+                            action.fn();
+                        }
                     }
                 }
-            });
-            toBeDeleted.forEach(function (index) {
-                clock._delayedActions.splice(index, 1);
             });
         },
 
         uninstall: function () {
+            clearTimeout: clock._clearTimeout;
+            clearInterval: clock._clearInterval;
             setTimeout = clock._setTimeout;
             setInterval = clock._setInterval;
         },
