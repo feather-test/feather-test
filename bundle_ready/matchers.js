@@ -18,6 +18,15 @@ function toStr (thing, printType) {
     return '"' + str + '" ' + (printType ? '{' + _typeof(thing) + '}' : '');
 }
 
+function isArray (obj) {
+    return (Object.prototype.toString.apply(obj) === '[object Array]') ||
+        (!!obj && !obj.indexOf);
+}
+
+function isSet (obj) {
+    return (Object.prototype.toString.apply(obj) === '[object Set]');
+}
+
 function deepMatch (expected, actual) {
     if (expected && expected.Any) {
         return _typeof(actual) === _typeof(expected.constructor())
@@ -71,6 +80,7 @@ function resultMessage (actual, matcher, expected, tab, neg, msg, lineMap, print
         '\n%%' + tab + toStr(expected, ptype);
 }
 
+
 function get (currentTest, options, tab, actual, lineMap, recordResult, negated) {
     var neg = negated ? 'not ' : '';
     var builtInMatchers = {
@@ -90,18 +100,28 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
             var result = resultMessage(actual, 'to contain', expected, tab, neg, msg, lineMap);
 
             function contains(actual, expected) {
-                if ((Object.prototype.toString.apply(actual) === '[object Set]')) {
+                if (isSet(actual)) {
                     return actual.has(expected);
                 }
 
-                if ((Object.prototype.toString.apply(actual) === '[object Array]') ||
-                    (!!actual && !actual.indexOf)) {
-                    for (var i = 0; i < actual.length; i++) {
-                        if (actual[i] === expected) {
-                            return true;
-                        }
+                if (isArray(actual)) {
+                    if (isArray(expected)) {
+                        var containsAllElements = true;
+                        each(expected, function (v) {
+                            if (actual.indexOf(v) === -1) {
+                                return containsAllElements = false;
+                            }
+                        });
+                        return containsAllElements;
+                    } else {
+                        var containsElement = false;
+                        each(actual, function (v) {
+                            if (v === expected) {
+                                return containsElement = true;
+                            }
+                        });
+                        return containsElement;
                     }
-                    return false;
                 }
 
                 return !!actual && actual.indexOf(expected) >= 0;
