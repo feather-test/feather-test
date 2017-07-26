@@ -32,5 +32,8 @@ describe('matchers', function (expect) {
         expect([1, 2, 3]).toContain([3]);
         expect([1, 2, 3]).not.toContain([3, 4]);
         expect([1, 2, 3]).toContain([1, 2, 3]);
+        expect(undefined).toContain('some value');
+        expect(null).toContain('some value');
+        expect(new Set(1, 2, 3)).toContain('some value');
     });
 });
