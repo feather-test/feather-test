@@ -18,6 +18,10 @@ function toStr (thing, printType) {
     return '"' + str + '" ' + (printType ? '{' + _typeof(thing) + '}' : '');
 }
 
+function isSet (obj) {
+    return (Object.prototype.toString.apply(obj) === '[object Set]');
+}
+
 function deepMatch (expected, actual) {
     if (expected && expected.Any) {
         return _typeof(actual) === _typeof(expected.constructor())
@@ -71,6 +75,7 @@ function resultMessage (actual, matcher, expected, tab, neg, msg, lineMap, print
         '\n%%' + tab + toStr(expected, ptype);
 }
 
+
 function get (currentTest, options, tab, actual, lineMap, recordResult, negated) {
     var neg = negated ? 'not ' : '';
     var builtInMatchers = {
@@ -88,17 +93,36 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
         },
         toContain: function (expected, msg) {
             var result = resultMessage(actual, 'to contain', expected, tab, neg, msg, lineMap);
-            var containsExpected = true;
-            if (typeof actual === 'string') {
-                containsExpected = actual.indexOf(expected) !== -1;
-            } else {
-                each(expected, function (v) {
-                    if (actual.indexOf(v) === -1) {
-                        return containsExpected = false;
+
+            function contains(actual, expected) {
+                if (isSet(actual)) {
+                    return actual.has(expected);
+                }
+
+                if (Array.isArray(actual)) {
+                    if (Array.isArray(expected)) {
+                        var containsAllElements = true;
+                        each(expected, function (v) {
+                            if (actual.indexOf(v) === -1) {
+                                return containsAllElements = false;
+                            }
+                        });
+                        return containsAllElements;
+                    } else {
+                        var containsElement = false;
+                        each(actual, function (v) {
+                            if (v === expected) {
+                                return containsElement = true;
+                            }
+                        });
+                        return containsElement;
                     }
-                })
+                }
+
+                return !!actual && actual.indexOf(expected) >= 0;
             }
-            recordResult(currentTest, containsExpected, negated, result);
+
+            recordResult(currentTest, contains(actual, expected), negated, result);
         },
         toEqual: function (expected, msg) {
             var result = resultMessage(actual, 'to equal', expected, tab, neg, msg, lineMap, true);
