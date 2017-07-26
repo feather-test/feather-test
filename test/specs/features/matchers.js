@@ -35,5 +35,10 @@ describe('matchers', function (expect) {
         expect(undefined).not.toContain('some value');
         expect(null).not.toContain('some value');
         expect(new Set()).not.toContain('some value');
+
+        var mySet = new Set();
+        mySet.add(1);
+        mySet.add(2);
+        expect(mySet).toContain(2);
     });
 });
