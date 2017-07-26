@@ -18,11 +18,6 @@ function toStr (thing, printType) {
     return '"' + str + '" ' + (printType ? '{' + _typeof(thing) + '}' : '');
 }
 
-function isArray (obj) {
-    return (Object.prototype.toString.apply(obj) === '[object Array]') ||
-        (!!obj && !obj.indexOf);
-}
-
 function isSet (obj) {
     return (Object.prototype.toString.apply(obj) === '[object Set]');
 }
@@ -104,8 +99,8 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
                     return actual.has(expected);
                 }
 
-                if (isArray(actual)) {
-                    if (isArray(expected)) {
+                if (Array.isArray(actual)) {
+                    if (Array.isArray(expected)) {
                         var containsAllElements = true;
                         each(expected, function (v) {
                             if (actual.indexOf(v) === -1) {
