@@ -19,7 +19,7 @@ function toStr (thing, printType) {
 }
 
 function isSet (obj) {
-    return (Object.prototype.toString.apply(obj) === '[object Set]');
+    return (toString.apply(obj) === '[object Set]');
 }
 
 function deepMatch (expected, actual) {
