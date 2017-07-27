@@ -3,7 +3,7 @@
  */
 
 var anythingToString = require('anything-to-string');
-var each = require('./each.js');
+var each = require('seebigs-each');
 var extend = require('./extend.js');
 
 var toString = Object.prototype.toString;

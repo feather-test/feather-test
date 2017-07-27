@@ -1,5 +1,5 @@
 const discoverSourcePath = require('discover-source-path');
-const each = require('./bundle_ready/each.js');
+const each = require('seebigs-each');
 const FeatherRunner = require('./bundle_ready/runner.js');
 const fs = require('fs');
 const path = require('path');

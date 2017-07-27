@@ -1,5 +1,5 @@
 var clone = require('./clone.js');
-var each = require('./each.js');
+var each = require('seebigs-each');
 
 var arrSlice = Array.prototype.slice;
 

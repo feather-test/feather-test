@@ -1,5 +1,5 @@
 var clone = require('./clone.js');
-var each = require('./each.js');
+var each = require('seebigs-each');
 var matchers =  require('./matchers.js');
 var reporter = require('./reporter.js');
 
