@@ -6,33 +6,33 @@ function report (results, tab, options) {
     outputHistory = '';
 
     if (results.failed.length) {
-        output('\nFailed tests:');
+        sendToOutput('\nFailed tests:');
         results.failed.forEach(function (failure) {
             var indent = '';
-            output('');
+            sendToOutput('');
             failure.labels.forEach(function (label) {
-                output(indent + label);
+                sendToOutput(indent + label);
                 indent += tab;
             });
             failure.failedExpectations.forEach(function (reason) {
-                output(reason, indent);
+                sendToOutput(reason, indent);
             });
         });
-        output('');
-        output(results.failed.length + ' tests failed!');
+        sendToOutput('');
+        sendToOutput(results.failed.length + ' tests failed!');
         if (options.exitProcessWhenFailing) {
             process.exit(1);
         }
 
     } else if (results.passed.length) {
-        output('\nAll ' + results.passed.length + ' tests passed!');
+        sendToOutput('\nAll ' + results.passed.length + ' tests passed!');
 
     } else {
-        output('\nNo tests ran.');
+        sendToOutput('\nNo tests ran.');
     }
 
     if (results.skipped.length) {
-        output('\n(' + results.skipped.length + ' tests skipped)');
+        sendToOutput('\n(' + results.skipped.length + ' tests skipped)');
     }
 
     if (options.reporterTargetElement) {
@@ -43,10 +43,14 @@ function report (results, tab, options) {
     }
 }
 
-function output (message, indent) {
+function sendToOutput (message, indent) {
     var msg = message.replace(/\%\%/g, indent);
-    console.log(msg);
     outputHistory += '\n' + msg;
+    output(msg);
+}
+
+function output (message) {
+    console.log(message);
 }
 
 module.exports = {
