@@ -378,6 +378,7 @@ function FeatherTestRunner (options) {
         addPlugin: addPlugin,
         listen: listen,
         report: report,
+        reporter: reporter,
     };
 }
 
