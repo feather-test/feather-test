@@ -1,6 +1,8 @@
 var outputHistory = '';
 
 function report (results, tab, options) {
+    options = options || {};
+    tab = tab || '   ';
     outputHistory = '';
 
     if (results.failed.length) {
