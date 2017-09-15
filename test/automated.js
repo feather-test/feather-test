@@ -56,7 +56,7 @@ passing(function () {
                     console.log = LOG.out;
                     console.log();
                     validate.all(LOG.history, [
-'\nAll 17 tests passed!',
+'\nAll 18 tests passed!',
 '\n(1 tests skipped)',
 '\nAll 3 tests passed!',
 '\nFailed tests:',

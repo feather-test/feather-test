@@ -36,4 +36,12 @@ describe('clock', function () {
         expect(setInterval.name).not.toBe('spy');
     });
 
+    clock.install();
+    describe('clock does not override setTimeout in our test framework', function (expect, done) {
+        clock.tick(9999999);
+        expect(1).toBe(1);
+        done();
+    });
+    clock.uninstall();
+
 });

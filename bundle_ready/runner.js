@@ -3,6 +3,11 @@ var each = require('seebigs-each');
 var matchers =  require('./matchers.js');
 var reporter = require('./reporter.js');
 
+var _origClearTimeout = clearTimeout;
+var _origClearInterval = clearInterval;
+var _origSetTimeout = setTimeout;
+var _origSetInterval = setInterval;
+
 function FeatherTestRunner (options) {
     if (!this instanceof FeatherTestRunner) {
         return new FeatherTestRunner();
@@ -82,7 +87,7 @@ function FeatherTestRunner (options) {
         if (async) {
             clonedExpectContext.async = true;
             assertionArgs.push(describeDone.bind(clonedExpectContext));
-            clonedExpectContext.timeout = setTimeout(function () {
+            clonedExpectContext.timeout = _origSetTimeout(function () {
                 reporter.output('\nSpec timed out!\n');
                 var indent = '';
                 clonedExpectContext.labels.forEach(function (label) {
@@ -119,7 +124,7 @@ function FeatherTestRunner (options) {
     }
 
     function describeDone () {
-        clearTimeout(this.timeout);
+        _origClearTimeout(this.timeout);
 
         if (this.async) {
             pendingAsync--;
