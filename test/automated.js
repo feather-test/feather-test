@@ -120,10 +120,13 @@ passing(function () {
 '*',
 '',
 '1 tests failed!',
-'\nSpec timed out!\n',
+'\nFailed tests:',
+'',
 'timeout',
 '   is handled properly',
-'      should call done() within 100ms'
+'      Timed out! It should call done() within 100ms',
+'',
+'1 tests failed!'
                     ]);
                 });
             });
