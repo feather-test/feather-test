@@ -32,6 +32,10 @@ describe('matchers', function (expect) {
         expect([1, 2, 3]).toContain([3]);
         expect([1, 2, 3]).not.toContain([3, 4]);
         expect([1, 2, 3]).toContain([1, 2, 3]);
+        expect({a: 1, b: 2, c: '3'}).toContain({c: '3'});
+        expect({a: 1, b: 2, c: 3}).toContain({c: 3});
+        expect({a: 1, b: 2, c: 3}).not.toContain({a: 3, c: 3});
+        expect({a: 1, b: 2, c: 3}).toContain({a: 1, b: 2, c: 3});
         expect(undefined).not.toContain('some value');
         expect(null).not.toContain('some value');
         expect(new Set()).not.toContain('some value');
