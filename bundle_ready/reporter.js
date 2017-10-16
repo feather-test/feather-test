@@ -19,7 +19,8 @@ function report (results, tab, options) {
             });
         });
         output('');
-        output(results.failed.length + ' tests failed!');
+        var totalNumTests = results.passed.length + results.failed.length;
+        output(results.failed.length + '/' + totalNumTests + ' tests failed!');
         if (options.exitProcessWhenFailing) {
             process.exit(1);
         }
