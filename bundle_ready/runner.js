@@ -70,7 +70,7 @@ function FeatherTestRunner (options) {
         expectContext.passedExpectations = [];
         expectContext.failedExpectations = [];
         expectContext.slowExpectations = [];
-        expectContext.startTime = new Date();
+        expectContext.startTime = Date.now();
         expectContext.containsExpectations = false;
 
         // optional setup
@@ -182,7 +182,8 @@ function FeatherTestRunner (options) {
     }
 
     function recordResult (currentTest, passed, negated, result) {
-        if ((new Date() - new Date(currentTest.startTime)) > 75) {
+        var slowTestsTime = options.slowTestTime || 50;
+        if ((Date.now() - currentTest.startTime) > slowTestsTime) {
             currentTest.slowExpectations.push(result);
         }
         if ((passed && !negated) || (!passed && negated)) {
