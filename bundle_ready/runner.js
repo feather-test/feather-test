@@ -86,13 +86,14 @@ function FeatherTestRunner (options) {
         var assertionArgs = [ expect.bind(clonedExpectContext) ];
         if (async) {
             clonedExpectContext.async = true;
+            var describeLine = new Error().stack.split('\n')[2];
             assertionArgs.push(describeDone.bind(clonedExpectContext));
             clonedExpectContext.timeout = _origSetTimeout(function () {
                 var indent = '';
                 clonedExpectContext.labels.forEach(function (label) {
                     indent += tab;
                 });
-                recordResult(clonedExpectContext, false, false, indent + 'Timed out! It should call done() within ' + options.timeout + 'ms');
+                recordResult(clonedExpectContext, false, false, indent + 'Timed out! It should call done() within ' + options.timeout + 'ms\n    ' + describeLine);
                 describeDone.apply(clonedExpectContext);
             }, options.timeout);
         }

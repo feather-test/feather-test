@@ -6,15 +6,19 @@ var chalk = require('chalk');
 var utils = require('seebigs-utils');
 
 // override console.log so we can validate output
-var LOG = {
+var CONSOLE = {
     history: [],
-    out: console.log
+    log: console.log,
+    error: console.error,
 };
 console.log = function (msg) {
-    LOG.history.push(msg);
-    // LOG.out(msg);
+    CONSOLE.history.push(msg);
+    CONSOLE.log(msg);
 };
-console.log.real = LOG.out;
+console.error = function (msg) {
+    CONSOLE.history.push(msg);
+    CONSOLE.error(msg);
+};
 
 var validate = {
 
@@ -22,19 +26,19 @@ var validate = {
         var unexpectedResults = false;
         utils.each(actual, function (entry, i) {
             if (entry !== expected[i] && expected[i] !== '*') {
-                LOG.out(chalk.red('   ✘ Expected "' + entry + '" to read "' + expected[i] + '"'));
+                CONSOLE.log(chalk.red('   ✘ Expected "' + entry + '" to read "' + expected[i] + '"'));
                 unexpectedResults = true;
                 return false;
             }
         });
         if (!unexpectedResults) {
-            LOG.out(chalk.green('   ✔ output is good'));
+            CONSOLE.log(chalk.green('\n   ✔ output is good\n'));
         }
     },
 
     one: function (issues, actual, expected) {
         if (actual !== expected) {
-            issues.push(chalk.red('   ✘ Expected "' + actual + '" to read "' + expected + '"'));
+            issues.push(chalk.red('\n   ✘ Expected "' + actual + '" to read "' + expected + '"\n'));
         }
     }
 
@@ -53,9 +57,9 @@ passing(function () {
             delete global.wrongValue;
             errors(function () {
                 timeout(function () {
-                    console.log = LOG.out;
+                    console.log = CONSOLE.log;
                     console.log();
-                    validate.all(LOG.history, [
+                    validate.all(CONSOLE.history, [
 '\nAll 18 tests passed!',
 '\n(1 tests skipped)',
 '\nAll 3 tests passed!',
@@ -124,9 +128,9 @@ passing(function () {
 '',
 'timeout',
 '   is handled properly',
-'      Timed out! It should call done() within 100ms',
+'*',
 '',
-'1 tests failed!'
+'1 tests failed!',
                     ]);
                 });
             });

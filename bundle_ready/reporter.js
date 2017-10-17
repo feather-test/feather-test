@@ -15,7 +15,7 @@ function report (results, tab, options) {
                 indent += tab;
             });
             failure.failedExpectations.forEach(function (reason) {
-                output(reason, indent);
+                outputError(reason, indent);
             });
         });
         output('');
@@ -43,10 +43,15 @@ function report (results, tab, options) {
     }
 }
 
-function output (message, indent) {
+function output (message, indent, _logger) {
+    _logger = _logger || console.log;
     var msg = message.replace(/\%\%/g, indent);
-    console.log(msg);
+    _logger(msg);
     outputHistory += '\n' + msg;
+}
+
+function outputError(message, indent) {
+    output(message, indent, console.error);
 }
 
 module.exports = {
