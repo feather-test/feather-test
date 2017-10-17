@@ -22,6 +22,21 @@ function isSet (obj) {
     return (toString.apply(obj) === '[object Set]');
 }
 
+function isObj(obj) {
+    return toString.apply(obj) === '[object Object]';
+}
+
+function isSubsetObj(actual, expected) {
+    var hasAll = true;
+    each(expected, function (v, k) {
+        var exactMatch = actual[k] === v;
+        if (!exactMatch) {
+            hasAll = false;
+        }
+    });
+    return hasAll;
+}
+
 function deepMatch (expected, actual) {
     if (expected && expected.Any) {
         return _typeof(actual) === _typeof(expected.constructor())
@@ -97,6 +112,10 @@ function get (currentTest, options, tab, actual, lineMap, recordResult, negated)
             function contains(actual, expected) {
                 if (isSet(actual)) {
                     return actual.has(expected);
+                }
+
+                if (isObj(expected) && isObj(actual)) {
+                    return isSubsetObj(actual, expected);
                 }
 
                 if (Array.isArray(actual)) {
