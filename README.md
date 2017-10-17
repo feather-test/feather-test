@@ -215,3 +215,6 @@ If set to `true` specs will halt execution after the first spec fails
 
 ### timeout
 How long (in ms) to wait for an async describe to call `done()`
+
+### slowTestsTime
+After how long(in ms) to wait until you log a slow test
