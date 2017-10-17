@@ -111,7 +111,7 @@ passing(function () {
 '*',
 '*',
 '',
-'9 tests failed!',
+'9/18 tests failed!',
 '\n(1 tests skipped)',
 '\nFailed tests:',
 '',
@@ -119,14 +119,18 @@ passing(function () {
 '   errors in assertions',
 '*',
 '',
-'1 tests failed!',
+'1/1 tests failed!',
 '\nFailed tests:',
 '',
 'timeout',
 '   is handled properly',
 '      Timed out! It should call done() within 100ms',
 '',
-'1 tests failed!'
+'1/1 tests failed!',
+'\n1 slow tests:',
+'',
+'timeout',
+'   is handled properly'
                     ]);
                 });
             });
