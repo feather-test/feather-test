@@ -12,7 +12,7 @@ var LOG = {
 };
 console.log = function (msg) {
     LOG.history.push(msg);
-    LOG.out(msg);
+    // LOG.out(msg);
 };
 console.log.real = LOG.out;
 
