@@ -33,6 +33,7 @@ function FeatherTestRunner (options) {
         passed: [],
         failed: [],
         skipped: [],
+        slow: [],
     };
     var spies = [];
 
@@ -43,6 +44,7 @@ function FeatherTestRunner (options) {
         results.passed = [];
         results.failed = [];
         results.skipped = [];
+        results.slow = [];
         spies = [];
     }
 
@@ -67,6 +69,8 @@ function FeatherTestRunner (options) {
         // reset expectations
         expectContext.passedExpectations = [];
         expectContext.failedExpectations = [];
+        expectContext.slowExpectations = [];
+        expectContext.startTime = Date.now();
         expectContext.containsExpectations = false;
 
         // optional setup
@@ -131,6 +135,9 @@ function FeatherTestRunner (options) {
         }
 
         if (this.containsExpectations) {
+            if (this.slowExpectations.length) {
+                results.slow.push(this);
+            }
             if (this.failedExpectations.length) {
                 results.failed.push(this);
                 if (options.stopAfterFistFailure) {
@@ -175,6 +182,10 @@ function FeatherTestRunner (options) {
     }
 
     function recordResult (currentTest, passed, negated, result) {
+        var slowTestsTime = options.slowTestTime || 50;
+        if ((Date.now() - currentTest.startTime) > slowTestsTime) {
+            currentTest.slowExpectations.push(result);
+        }
         if ((passed && !negated) || (!passed && negated)) {
             currentTest.passedExpectations.push(result);
         } else {

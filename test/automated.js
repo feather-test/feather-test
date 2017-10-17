@@ -12,7 +12,7 @@ var LOG = {
 };
 console.log = function (msg) {
     LOG.history.push(msg);
-    // LOG.out(msg);
+    LOG.out(msg);
 };
 console.log.real = LOG.out;
 
@@ -126,7 +126,11 @@ passing(function () {
 '   is handled properly',
 '      Timed out! It should call done() within 100ms',
 '',
-'1/1 tests failed!'
+'1/1 tests failed!',
+'\n1 slow tests:',
+'',
+'timeout',
+'   is handled properly'
                     ]);
                 });
             });
