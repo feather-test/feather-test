@@ -69,6 +69,9 @@ function FeatherTestRunner (options) {
         expectContext.failedExpectations = [];
         expectContext.containsExpectations = false;
 
+        // reset internals
+        clock._delayedActions = {};
+
         // optional setup
         if (typeof options.beforeEach === 'function') {
             options.beforeEach();
@@ -104,6 +107,7 @@ function FeatherTestRunner (options) {
             });
             expectContext.depth--;
             expectContext.labels.pop();
+            clock._delayedActions = {};
         }
 
         try {
@@ -280,8 +284,8 @@ function FeatherTestRunner (options) {
         _delayedActions: {},
 
         install: function () {
-            if (setTimeout.name !== 'spy') {
-                spy.on(global, 'setTimeout', function (fn, delay) {
+            if (setTimeout.name !== 'featherSetTimeout') {
+                global.setTimeout = function featherSetTimeout (fn, delay) {
                     if (typeof fn === 'function') {
                         clock._guid++;
                         clock._delayedActions[clock._guid] = {
@@ -291,17 +295,17 @@ function FeatherTestRunner (options) {
                         };
                         return clock._guid;
                     }
-                });
+                };
             }
 
-            if (clearTimeout.name !== 'spy') {
-                spy.on(global, 'clearTimeout', function (id) {
+            if (clearTimeout.name !== 'featherClearTimeout') {
+                global.clearTimeout = function featherClearTimeout (id) {
                     delete clock._delayedActions[id];
-                });
+                };
             }
 
-            if (setInterval.name !== 'spy') {
-                spy.on(global, 'setInterval', function (fn, delay) {
+            if (setInterval.name !== 'featherSetInterval') {
+                global.setInterval = function featherSetInterval (fn, delay) {
                     if (typeof fn === 'function') {
                         clock._guid++;
                         clock._delayedActions[clock._guid] = {
@@ -312,13 +316,13 @@ function FeatherTestRunner (options) {
                         };
                         return clock._guid;
                     }
-                });
+                }
             }
 
-            if (clearInterval.name !== 'spy') {
-                spy.on(global, 'clearInterval', function (id) {
+            if (clearInterval.name !== 'featherClearInterval') {
+                global.clearInterval = function featherClearInterval (id) {
                     delete clock._delayedActions[id];
-                });
+                }
             }
         },
 
