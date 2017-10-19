@@ -292,6 +292,7 @@ function FeatherTestRunner (options) {
                             timestamp: clock._timer,
                             delay: delay || 0,
                             fn: fn,
+                            args: Array.prototype.slice.call(arguments, 2),
                         };
                         return clock._guid;
                     }
@@ -312,6 +313,7 @@ function FeatherTestRunner (options) {
                             timestamp: clock._timer,
                             delay: delay || 0,
                             fn: fn,
+                            args: Array.prototype.slice.call(arguments, 2),
                             recurring: true,
                         };
                         return clock._guid;
@@ -333,12 +335,12 @@ function FeatherTestRunner (options) {
                     if (action.recurring) {
                         let times = Math.floor((clock._timer - action.timestamp) / action.delay);
                         for (let i = 0; i < times; i++) {
-                            action.fn();
+                            action.fn.apply({}, action.args);
                         }
                     } else {
                         if (clock._timer - action.timestamp >= action.delay) {
                             delete clock._delayedActions[id];
-                            action.fn();
+                            action.fn.apply({}, action.args);
                         }
                     }
                 }

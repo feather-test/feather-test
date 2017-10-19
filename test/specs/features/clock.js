@@ -7,12 +7,12 @@ describe('clock', function () {
         expect(setTimeout.name).toBe('featherSetTimeout');
 
         let happened = 0;
-        setTimeout(function () {
-            happened++;
-        }, 2000);
+        setTimeout(function (num) {
+            happened += num;
+        }, 2000, 3);
 
         clock.tick(2000);
-        expect(happened).toBe(1);
+        expect(happened).toBe(3);
 
         clock.uninstall();
         expect(setTimeout.name).not.toBe('featherSetTimeout');
@@ -25,12 +25,12 @@ describe('clock', function () {
         expect(setInterval.name).toBe('featherSetInterval');
 
         let happened = 0;
-        setInterval(function () {
-            happened++;
-        }, 2000);
+        setInterval(function (num) {
+            happened += num;
+        }, 2000, 3);
 
         clock.tick(6543);
-        expect(happened).toBe(3);
+        expect(happened).toBe(9);
 
         clock.uninstall();
         expect(setInterval.name).not.toBe('featherSetInterval');
