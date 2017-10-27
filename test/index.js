@@ -33,6 +33,8 @@ var validate = {
         });
         if (!unexpectedResults) {
             CONSOLE.log(chalk.green('\n   ✔ output is good\n'));
+        } else {
+            process.exit(1);
         }
     },
 
