@@ -308,7 +308,7 @@ function FeatherTestRunner (options) {
                         timestamp: timestamp,
                         delay: delay,
                         fn: fn,
-                        args: Array.prototype.slice.call(arguments, 2),
+                        args: args,
                     });
                     return clock._guid;
                 }
