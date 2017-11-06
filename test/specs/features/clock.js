@@ -78,6 +78,15 @@ describe('clock', function() {
                 clock.uninstall();
             });
 
+            it('passes extra params as arguments to the executed fn', function (expect) {
+                clock.install();
+                var aSpy = spy();
+                setTimeout(aSpy, 100, 3, 'foo');
+                clock.tick(100);
+                expect(aSpy).toHaveBeenCalledWith(3, 'foo');
+                clock.uninstall();
+            });
+
             it('executes setTimeouts that create other setTimeouts', function(expect) {
                 clock.install();
                 var calls = 0;
@@ -109,6 +118,17 @@ describe('clock', function() {
                 expect(aSpy.calls.length).toBe(4);
                 clock.uninstall();
             });
+
+            it('passes extra params as arguments to the executed fn', function (expect) {
+                clock.install();
+                var aSpy = spy();
+                setInterval(aSpy, 100, 3, 'foo');
+                clock.tick(100);
+                expect(aSpy.calls[0]).toBe([3, 'foo']);
+                clock.tick(100);
+                expect(aSpy.calls[1]).toBe([3, 'foo']);
+                clock.uninstall();
+            });
         });
 
         it('orders the setTimeouts and setIntervals based on when they should be executed', function(expect) {
@@ -135,7 +155,8 @@ describe('clock', function() {
             clock.tick(80);
             expect(calls).toBe(['first', 'second', 'third']);
             clock.uninstall();
-        })
+        });
+
     });
 
     describe('separation from framework internals', function() {
