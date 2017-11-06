@@ -70,7 +70,7 @@ function FeatherTestRunner (options) {
         expectContext.containsExpectations = false;
 
         // reset internals
-        clock._delayedActions = {};
+        clock._delayedActions = [];
 
         // optional setup
         if (typeof options.beforeEach === 'function') {
@@ -83,7 +83,7 @@ function FeatherTestRunner (options) {
             var finalMatchers = matchers.get(this, options, tab, actual, lineMap, recordResult);
             finalMatchers.not = matchers.get(this, options, tab, actual, lineMap, recordResult, true);
             return finalMatchers;
-        }
+        };
 
         var clonedExpectContext = clone(expectContext);
         var assertionArgs = [ expect.bind(clonedExpectContext) ];
@@ -107,7 +107,7 @@ function FeatherTestRunner (options) {
             });
             expectContext.depth--;
             expectContext.labels.pop();
-            clock._delayedActions = {};
+            clock._delayedActions = [];
         }
 
         try {
@@ -281,75 +281,94 @@ function FeatherTestRunner (options) {
         _setInterval: setInterval,
         _guid: 0,
         _timer: 0,
-        _delayedActions: {},
-
-        install: function () {
-            if (setTimeout.name !== 'featherSetTimeout') {
-                global.setTimeout = function featherSetTimeout (fn, delay) {
-                    if (typeof fn === 'function') {
-                        clock._guid++;
-                        clock._delayedActions[clock._guid] = {
-                            timestamp: clock._timer,
-                            delay: delay || 0,
-                            fn: fn,
-                            args: Array.prototype.slice.call(arguments, 2),
-                        };
-                        return clock._guid;
+        _delayedActions: [],
+        _removeAction: function (id) {
+            function find(id) {
+                var index = null;
+                each(clock._delayedActions, function (action, i) {
+                    if (action.id === id) {
+                        index = i;
                     }
-                };
+                });
+                return index;
             }
 
-            if (clearTimeout.name !== 'featherClearTimeout') {
-                global.clearTimeout = function featherClearTimeout (id) {
-                    delete clock._delayedActions[id];
-                };
-            }
-
-            if (setInterval.name !== 'featherSetInterval') {
-                global.setInterval = function featherSetInterval (fn, delay) {
-                    if (typeof fn === 'function') {
-                        clock._guid++;
-                        clock._delayedActions[clock._guid] = {
-                            timestamp: clock._timer,
-                            delay: delay || 0,
-                            fn: fn,
-                            args: Array.prototype.slice.call(arguments, 2),
-                            recurring: true,
-                        };
-                        return clock._guid;
-                    }
-                }
-            }
-
-            if (clearInterval.name !== 'featherClearInterval') {
-                global.clearInterval = function featherClearInterval (id) {
-                    delete clock._delayedActions[id];
-                }
-            }
+            clock._delayedActions.splice(find(id), 1);
         },
 
-        tick: function (amount) {
-            clock._timer += amount;
-            each(clock._delayedActions, function (action, id) {
-                if (action) {
-                    if (action.recurring) {
-                        let times = Math.floor((clock._timer - action.timestamp) / action.delay);
-                        for (let i = 0; i < times; i++) {
-                            action.fn.apply({}, action.args);
-                        }
-                    } else {
-                        if (clock._timer - action.timestamp >= action.delay) {
-                            delete clock._delayedActions[id];
-                            action.fn.apply({}, action.args);
-                        }
-                    }
+        install: function () {
+            function addAction(fn, delay, args) {
+                delay = delay || 0;
+                if (typeof fn === 'function') {
+                    var timestamp = clock._timer;
+                    clock._guid++;
+                    clock._delayedActions.push({
+                        id: clock._guid,
+                        absoluteTime: delay + clock._timer,
+                        timestamp: timestamp,
+                        delay: delay,
+                        fn: fn,
+                        args: Array.prototype.slice.call(arguments, 2),
+                    });
+                    return clock._guid;
                 }
-            });
+            }
+
+            global.setTimeout = function(fn, delay) {
+                if (typeof fn === 'function') {
+                    return addAction(fn, delay, Array.prototype.slice.call(arguments, 2));
+                }
+            };
+
+            global.setInterval = function(fn, delay) {
+                delay = delay || 0;
+                if (typeof fn === 'function') {
+                    var args = Array.prototype.slice.call(arguments, 0);
+                    return addAction(function () {
+                        fn.apply({}, Array.prototype.slice.call(args, 2));
+                        global.setInterval.apply({}, args);
+                    }, delay, args)
+                }
+            };
+
+            global.clearInterval = clock._removeAction;
+            global.clearTimeout = clock._removeAction;
+        },
+
+        tick: function (timeIncrement) {
+            var eventualSystemTime = clock._timer + timeIncrement;
+            function getNextAction() {
+                // go through all delayed actions that have been added
+                // its important re-filter and re-sort in case an action
+                // mutated this list while it was executing.
+                var actions = clock._delayedActions
+                    .filter(function (action) {
+                        return action.absoluteTime <= eventualSystemTime;
+                    })
+                    .sort(function(a1, a2) {
+                        return a1.delay + a1.timestamp > a2.delay + a2.timestamp;
+                    });
+                return actions[0];
+            }
+
+            function doAction() {
+                var action = getNextAction();
+                if (action) {
+                    clock._timer = action.absoluteTime;
+                    action.fn.apply({}, action.args);
+
+                    clock._removeAction(action.id);
+                    doAction();
+                }
+            }
+
+            doAction();
+            clock._timer = eventualSystemTime;
         },
 
         uninstall: function () {
-            clearTimeout: clock._clearTimeout;
-            clearInterval: clock._clearInterval;
+            clearTimeout = clock._clearTimeout;
+            clearInterval = clock._clearInterval;
             setTimeout = clock._setTimeout;
             setInterval = clock._setInterval;
         },
