@@ -1,5 +1,7 @@
 # feather-test
 
+<img src="https://travis-ci.org/feather-test/feather-test.svg?branch=master"></img>
+
 **Extremely lightweight JavaScript test coverage**
 
 *Refactor safely -- without configuring a burdensome test suite*
