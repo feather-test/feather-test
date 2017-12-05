@@ -28,7 +28,7 @@
   "author": "Chris Bigelow <seebigswork@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/seebigs/feather-test/issues"
+    "url": "https://github.com/feather-test/feather-test/issues"
   },
   "devDependencies": {
     "chalk": "^2.0.1"
