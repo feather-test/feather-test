@@ -11,11 +11,16 @@ cache:
 install:
 - npm install
 script:
+- echo "Running tests against $(node -v) ..."
 - npm test
-deploy:
-  provider: npm
-  email: "jsachs8@gmail.com"
-  api_key:
-    secure: NJObDlHgVMOQYBQa3ZHm8X70Dr8kYlgcogbsMFUCUhQS8ILmQ+KY53pyjvEJPmZ7llH367h1WYLKa26DbIrfVwj5LvaLciZh/OBo95I6O/79j2cMLs9ZktMB9eyL9vNl/DMxzx9UHiOAhur6BXqDpFfYFCUZVVKW0e9aZsz7SBhygnCEOSlckJvCWL4lliGLYX2BCSoJvc50aXDoTjPS2c/TPnSIYUGQ2fZZsuvFtBcZ7xgD8pjWXAHmAKTXqLOGpTm0JMh0/ETICAfMERh9PtycZrivO8n+wZHY5/2jijGi5HEHCZPhYTvC2UuUV1clCp7npAgqh39jiNIhWSp7M7+0F1qjM4wjID+H3lJMmsFBvkAtt9yQBgfz2D3cWM6XLEKqgaXCTjUdiu9xu13WE4VnQtu4u0y67uq/YpgORrcLqIutyl28gjjRxk3zZzsX8eLP9aIsj0DVq2EWE9ygnBSOK0PnVNbGbu+Y54qIMs5sBBmaZtJRqgJUJ1iB96fwfqx6N+w3wrR1195vjM+Y7+88YdF9yRbiVu6k+bsheLKU8s3Be3mmES8Mcu9jAFUiGQyTykvIWfu84XMfYVJWONJJL78SDPaP6/d9GQNmiB47HqAE9kRJARvokXHORryAFK1q5NNrI2WYvNh9ZY/EEgDdVCmZrXxt3bsLzJA4a4o=
-  on:
-    branch: master
+jobs:
+  include:
+    - stage: publish
+    script: echo "Deploying to npm ..."
+    deploy:
+      provider: npm
+      email: "jsachs8@gmail.com"
+      api_key:
+        secure: NJObDlHgVMOQYBQa3ZHm8X70Dr8kYlgcogbsMFUCUhQS8ILmQ+KY53pyjvEJPmZ7llH367h1WYLKa26DbIrfVwj5LvaLciZh/OBo95I6O/79j2cMLs9ZktMB9eyL9vNl/DMxzx9UHiOAhur6BXqDpFfYFCUZVVKW0e9aZsz7SBhygnCEOSlckJvCWL4lliGLYX2BCSoJvc50aXDoTjPS2c/TPnSIYUGQ2fZZsuvFtBcZ7xgD8pjWXAHmAKTXqLOGpTm0JMh0/ETICAfMERh9PtycZrivO8n+wZHY5/2jijGi5HEHCZPhYTvC2UuUV1clCp7npAgqh39jiNIhWSp7M7+0F1qjM4wjID+H3lJMmsFBvkAtt9yQBgfz2D3cWM6XLEKqgaXCTjUdiu9xu13WE4VnQtu4u0y67uq/YpgORrcLqIutyl28gjjRxk3zZzsX8eLP9aIsj0DVq2EWE9ygnBSOK0PnVNbGbu+Y54qIMs5sBBmaZtJRqgJUJ1iB96fwfqx6N+w3wrR1195vjM+Y7+88YdF9yRbiVu6k+bsheLKU8s3Be3mmES8Mcu9jAFUiGQyTykvIWfu84XMfYVJWONJJL78SDPaP6/d9GQNmiB47HqAE9kRJARvokXHORryAFK1q5NNrI2WYvNh9ZY/EEgDdVCmZrXxt3bsLzJA4a4o=
+      on:
+        branch: master
