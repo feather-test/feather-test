@@ -16,7 +16,6 @@ script:
 jobs:
   include:
     - stage: publish
-      script: echo "Deploying to npm ..."
       deploy:
         provider: npm
         email: "jsachs8@gmail.com"

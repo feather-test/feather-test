@@ -22,9 +22,6 @@
     "type": "git",
     "url": "git+https://github.com/feather-test/feather-test.git"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "author": "Chris Bigelow <seebigswork@gmail.com>",
   "license": "MIT",
   "bugs": {
