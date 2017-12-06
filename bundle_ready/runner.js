@@ -222,9 +222,11 @@ function FeatherTestRunner (options) {
 
     /* SPIES */
 
-    function Spy (original = function(){}, replacement) {
+    function Spy (original, replacement) {
+        original = original || function(){};
+
         function spy () {
-            let args = Array.prototype.slice.call(arguments);
+            var args = Array.prototype.slice.call(arguments);
             spy.calls.push(args);
             if (typeof replacement === 'function') {
                 return replacement.apply(this, args);
@@ -238,8 +240,8 @@ function FeatherTestRunner (options) {
     }
 
     Spy.on = function (obj, methodName, replacement) {
-        let original = obj[methodName];
-        let spy = Spy(original, replacement);
+        var original = obj[methodName];
+        var spy = Spy(original, replacement);
 
         if (original) {
             spies[expectContext.depth] = spies[expectContext.depth] || [];
@@ -274,7 +276,7 @@ function FeatherTestRunner (options) {
 
     /* CLOCK */
 
-    let clock = {
+    var clock = {
         _clearTimeout: clearTimeout,
         _clearInterval: clearInterval,
         _setTimeout: setTimeout,

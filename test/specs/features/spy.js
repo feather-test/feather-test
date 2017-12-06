@@ -1,9 +1,9 @@
 describe('spy', function () {
 
     describe('replaces original behavior and restores when done', function (expect) {
-        let originalCalled = 0;
-        let replacementCalled = 0;
-        let obj = {
+        var originalCalled = 0;
+        var replacementCalled = 0;
+        var obj = {
             method: function (arg) {
                 originalCalled += arg;
             }
@@ -12,7 +12,7 @@ describe('spy', function () {
         describe('replaces original behavior and restores when done', function (expect) {
             expect(originalCalled).toBe(0);
             expect(replacementCalled).toBe(0);
-            let spiedMethod = spy.on(obj, 'method', function (arg) {
+            var spiedMethod = spy.on(obj, 'method', function (arg) {
                 replacementCalled += arg;
             });
 
@@ -33,10 +33,10 @@ describe('spy', function () {
     });
 
     describe('tracks calls and arguments', function (expect) {
-        let obj = {
+        var obj = {
             method: function(){}
         };
-        let spiedMethod = spy.on(obj, 'method');
+        var spiedMethod = spy.on(obj, 'method');
         obj.method(4,5,6);
         obj.method(7,8,9);
         expect(obj.method.calls).toBe([
@@ -50,7 +50,7 @@ describe('spy', function () {
     });
 
     describe('can be created from scratch', function (expect) {
-        let s = spy();
+        var s = spy();
         expect(typeof s).toBe('function');
         expect(s.name).toBe('spy');
         expect(s.calls).toBe([]);

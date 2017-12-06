@@ -1,5 +1,5 @@
 
-let obj = {
+var obj = {
     method: function () {},
 };
 

@@ -169,8 +169,8 @@ describe('clock', function() {
             done();
         });
 
-        let crossoverTimeout = 0;
-        let crossoverInterval = 0;
+        var crossoverTimeout = 0;
+        var crossoverInterval = 0;
 
         describe('queued actions are reset between describe blocks', function() {
             setTimeout(function() {
@@ -186,8 +186,8 @@ describe('clock', function() {
         }, 1000);
 
         describe('queued actions are reset before and after describe blocks', function(expect) {
-            let internalTimeout = 0;
-            let internalInterval = 0;
+            var internalTimeout = 0;
+            var internalInterval = 0;
 
             clock.tick(2001);
 

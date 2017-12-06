@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "anything-to-string": "^0.1.0",
-    "discover-source-path": "^0.1.0",
+    "discover-source-path": "^1.0.0",
     "seebigs-each": "^1.0.1",
     "seebigs-utils": "^1.4.1"
   }
