@@ -10,12 +10,13 @@ cache:
   - node_modules
 install:
 - npm install
-script:
-- echo "Running tests against $(node -v) ..."
-- npm test
 jobs:
   include:
+    - stage: test
+      script: npm test
     - stage: publish
+      install: skip
+      script: skip
       deploy:
         provider: npm
         email: "jsachs8@gmail.com"
