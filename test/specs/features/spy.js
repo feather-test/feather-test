@@ -50,10 +50,16 @@ describe('spy', function () {
     });
 
     describe('can be created from scratch', function (expect) {
-        var s = spy();
+        var replaced = false;
+        var s = spy(function (v) {
+            replaced = v;
+        });
         expect(typeof s).toBe('function');
         expect(s.name).toBe('spy');
         expect(s.calls).toBe([]);
+        s(true);
+        expect(s.calls).toBe([[true]]);
+        expect(replaced).toBe(true);
     });
 
 });

@@ -222,7 +222,7 @@ function FeatherTestRunner (options) {
 
     /* SPIES */
 
-    function Spy (original, replacement) {
+    function Spy (replacement, original) {
         original = original || function(){};
 
         function spy () {
@@ -241,7 +241,7 @@ function FeatherTestRunner (options) {
 
     Spy.on = function (obj, methodName, replacement) {
         var original = obj[methodName];
-        var spy = Spy(original, replacement);
+        var spy = Spy(replacement, original);
 
         if (original) {
             spies[expectContext.depth] = spies[expectContext.depth] || [];
@@ -252,6 +252,9 @@ function FeatherTestRunner (options) {
             });
 
             obj[methodName] = spy;
+
+        } else {
+            throw new Error('spy.on property `' + methodName + '` does not exist. Use `obj.' + methodName + ' = spy()` instead.');
         }
 
         return spy;

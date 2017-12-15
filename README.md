@@ -158,7 +158,9 @@ describe('overrides setTimeout when installed', function (expect) {
 ```
 
 ### spy
-Stub or mock any function or method. `spy.on()` watches and counts each invocation. `spy()` creates a new spy.
+Stub or mock any function or method.
+
+`spy.on()` watches and counts each invocation.
 ```js
 describe('no double agents here', function (expect) {
     let obj = {
@@ -178,6 +180,14 @@ describe('no double agents here', function (expect) {
 
     // spies are reset after the containing describe is done
     expect(obj.method()).toBe('original');
+});
+```
+`spy()` creates a new spy.
+```js
+describe('your secret training is complete', function (expect) {
+    let doubleOhSeven = spy(() => { return { license: 'kill'}; });
+    expect(doubleOhSeven().license).toBe('kill');
+    expect(doubleOhSeven).toHaveBeenCalled();
 });
 ```
 
