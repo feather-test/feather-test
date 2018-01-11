@@ -2,7 +2,7 @@
 describe('promises', () => {
 
     describe('promise resolve', (expect, done) => {
-        let p = new Promise((resolve, reject) => {
+        var p = new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve('finito');
             }, 10);
@@ -14,7 +14,7 @@ describe('promises', () => {
     });
 
     describe('promise reject', (expect, done) => {
-        let p = new Promise((resolve, reject) => {
+        var p = new Promise((resolve, reject) => {
             setTimeout(() => {
                 reject('finito');
             }, 10);
@@ -26,7 +26,7 @@ describe('promises', () => {
     });
 
     describe('promise error', (expect, done) => {
-        let p = new Promise((resolve, reject) => {
+        var p = new Promise((resolve, reject) => {
             throw new Error('oops');
         });
         p.then().catch((error) => {
