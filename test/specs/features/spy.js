@@ -62,4 +62,71 @@ describe('spy', function () {
         expect(replaced).toBe(true);
     });
 
+    describe('works asyncronously', function () {
+
+        describe('works with setTimeout', function (expect, done) {
+            var originalCalled = 0;
+            var replacementCalled = 0;
+            var obj = {
+                method: function (arg) {
+                    originalCalled += arg;
+                }
+            };
+
+            function validate() {
+                expect(originalCalled).toBe(0);
+                expect(replacementCalled).toBe(1);
+                done();
+            }
+
+            spy.on(obj, 'method', function (arg) {
+                replacementCalled += arg;
+            });
+
+            describe('inside1', function () {
+                describe('inside2', function () {
+                    setTimeout(function () {
+                        obj.method(1);
+                        validate();
+                    }, 10);
+                });
+            });
+        });
+
+        describe('works with Promise', function (expect, done) {
+            var originalCalled = 0;
+            var replacementCalled = 0;
+            var obj = {
+                method: function (arg) {
+                    originalCalled += arg;
+                }
+            };
+
+            function validate() {
+                expect(originalCalled).toBe(0);
+                expect(replacementCalled).toBe(2);
+                done();
+            }
+
+            spy.on(obj, 'method', function (arg) {
+                replacementCalled += arg;
+            });
+
+            describe('inside1', function () {
+                describe('inside2', function () {
+                    let p = new Promise((resolve, reject) => {
+                        obj.method(1);
+                        setTimeout(() => {
+                            resolve();
+                        }, 10);
+                    });
+                    p.then((success) => {
+                        obj.method(1);
+                        validate();
+                    });
+                });
+            });
+        });
+    });
+
 });
