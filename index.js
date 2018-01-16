@@ -9,8 +9,10 @@ const utils = require('seebigs-utils');
 function runInNode (relativeTo, options, done) {
 
     function clearRequireCache () {
-        for (var x in require.cache) {
-            delete require.cache[x];
+        if (options.clearCacheBetweenSpecFiles) {
+            for (var x in require.cache) {
+                delete require.cache[x];
+            }
         }
     }
 
@@ -61,6 +63,7 @@ function FeatherTest (config) {
 
     var defaultConfig = {
         helpers: [],
+        clearCacheBetweenSpecFiles: true,
         exitProcessWhenFailing: true,
         stopAfterFistFailure: false,
         timeout: 5000
