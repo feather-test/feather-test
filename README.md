@@ -190,6 +190,31 @@ describe('your secret training is complete', function (expect) {
     expect(doubleOhSeven).toHaveBeenCalled();
 });
 ```
+Pass a closured reference into async blocks to avoid having your spied functions reset.
+```js
+var obj = {
+    method: function () {
+        console.log('original');
+    }
+};
+
+describe('test some stuff', function () {
+    describe('do something async', function () {
+        spy.on(obj, 'method', function () {
+            console.log('spied');
+        });
+        var spiedFn = obj.method; // save into a new reference that can be closured below
+        setTimeout(function () {
+            // must be used here as `spiedFn` not as `obj.method`
+            spiedFn(1); // output: "spied"
+        }, 10);
+    });
+    describe('do something async', function () {
+        obj.method(); // output: "original"
+    });
+});
+
+```
 
 ---
 
