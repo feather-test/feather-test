@@ -28,12 +28,12 @@
     "url": "https://github.com/feather-test/feather-test/issues"
   },
   "devDependencies": {
-    "chalk": "^2.0.1"
+    "chalk": "^2.3.2"
   },
   "dependencies": {
     "anything-to-string": "^0.1.0",
     "discover-source-path": "^1.0.0",
-    "seebigs-each": "^1.0.1",
+    "seebigs-each": "^1.1.0",
     "seebigs-utils": "^1.4.1"
   }
 }
