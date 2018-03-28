@@ -50,6 +50,7 @@ function FeatherTestRunner (options) {
     /* DESCRIBES & EXPECTS */
 
     function describe (label, assertions) {
+        var expectationsAsserted = false;
         var async = assertions.length > 1;
 
         if (async) {
@@ -65,6 +66,7 @@ function FeatherTestRunner (options) {
         expectContext.labels.push(label);
 
         // reset expectations
+        expectContext.expectationsRequired = assertions.length > 0;
         expectContext.passedExpectations = [];
         expectContext.failedExpectations = [];
         expectContext.containsExpectations = false;
@@ -77,25 +79,23 @@ function FeatherTestRunner (options) {
             options.beforeEach();
         }
 
+        var clonedExpectContext = clone(expectContext);
 
         var expect = function (actual) {
+            clonedExpectContext.expectationsAsserted = true;
             var lineMap = getLineMap(new Error());
             var finalMatchers = matchers.get(this, options, tab, actual, lineMap, recordResult);
             finalMatchers.not = matchers.get(this, options, tab, actual, lineMap, recordResult, true);
             return finalMatchers;
         };
 
-        var clonedExpectContext = clone(expectContext);
         var assertionArgs = [ expect.bind(clonedExpectContext) ];
         if (async) {
             clonedExpectContext.async = true;
             var describeLine = new Error().stack.split('\n')[2];
             assertionArgs.push(describeDone.bind(clonedExpectContext));
             clonedExpectContext.timeout = _origSetTimeout(function () {
-                var indent = '';
-                clonedExpectContext.labels.forEach(function (label) {
-                    indent += tab;
-                });
+                var indent = getCurrentIndent(clonedExpectContext);
                 recordResult(clonedExpectContext, false, false, indent + 'Timed out! It should call done() within ' + options.timeout + 'ms\n    ' + describeLine);
                 describeDone.apply(clonedExpectContext);
             }, options.timeout);
@@ -135,16 +135,26 @@ function FeatherTestRunner (options) {
             pendingSync--;
         }
 
-        if (this.containsExpectations) {
-            if (this.failedExpectations.length) {
-                results.failed.push(this);
-                if (options.stopAfterFistFailure) {
-                    shortCircuit(true);
-                }
-            } else if (this.passedExpectations.length) {
-                results.passed.push(this);
+        var expectContext = this;
+
+        function failOut() {
+            results.failed.push(expectContext);
+            if (options.stopAfterFistFailure) {
+                shortCircuit(true);
             }
-            this.containsExpectations = false;
+        }
+
+        if (expectContext.containsExpectations) {
+            if (expectContext.failedExpectations.length) {
+                failOut();
+            } else if (expectContext.passedExpectations.length) {
+                results.passed.push(expectContext);
+            }
+            expectContext.containsExpectations = false;
+
+        } else if (expectContext.expectationsRequired) {
+            recordResult(expectContext, false, false, getCurrentIndent(expectContext) + 'No expectations were asserted!');
+            failOut();
         }
 
         // teardown
@@ -153,6 +163,14 @@ function FeatherTestRunner (options) {
         }
 
         afterRun();
+    }
+
+    function getCurrentIndent(expectContext) {
+        var indent = '';
+        expectContext.labels.forEach(function (label) {
+            indent += tab;
+        });
+        return indent;
     }
 
     function getLineMap (err) {

@@ -192,6 +192,7 @@ describe('clock', function() {
             clock.tick(2001);
 
             describe('pending inner timeout should be cleared when describe is done', function(expect, done) {
+                expect(1).toBe(1);
                 setTimeout(function() {
                     internalTimeout++;
                 }, 1000);
